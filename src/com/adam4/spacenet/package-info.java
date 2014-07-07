@@ -7,5 +7,4 @@
  * with others as well as join games
  */
 
-
 package com.adam4.spacenet;

@@ -15,16 +15,17 @@ public class Network
     private static boolean acceptingNewClients;
 
     private static ClientListener clientListener;
-    //private static AdminListener adminListener;
+    // private static AdminListener adminListener;
     private static Thread clientListenerThread;
-   // private static Thread adminListenerThread;
+
+    // private static Thread adminListenerThread;
 
     Network()
     {
         clientListener = new ClientListener();
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
-        //adminListener = new AdminListener();
+        // adminListener = new AdminListener();
     }
 
     void acceptNewClients()
@@ -50,39 +51,39 @@ public class Network
             }
             catch (Exception e)
             {
-            	Server.log.LogMessage(Thread.currentThread(), "Unable to start ClientListener socket", MyLogger.LogLevel.ERROR , e);
+                Common.log.LogMessage(Thread.currentThread(), "Unable to start ClientListener socket", MyLogger.LogLevel.ERROR, e);
             }
         }
 
         @Override
-        public
-            void run()
+        public void run()
         {
-        	 while (acceptingNewClients)
-             {
-                 try
-                 {
-                     serverSocket.setSoTimeout(Server.ENDCHECKFREQUENCY);
-                     Socket clientSocket = serverSocket.accept();
-                     if (acceptingNewClients)
-                     {
-                         
-                     }
-                     else
-                     {
+            while (acceptingNewClients)
+            {
+                try
+                {
+                    serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
+                    Socket clientSocket = serverSocket.accept();
+                    if (acceptingNewClients)
+                    {
 
-                     }
-                 }
-                 catch (SocketException e)
-                 {
-                     ;
-                     // do nothing; this is an exit due to SoTimeout such that it can check that if it should still be listening or not
-                 }
-                 catch (IOException e)
-                 {
-                	 Server.log.LogMessage(Thread.currentThread(), "Network error", MyLogger.LogLevel.INFO , e);
-                 }
-             }
+                    }
+                    else
+                    {
+
+                    }
+                }
+                catch (SocketException e)
+                {
+                    ;
+                    // do nothing; this is an exit due to SoTimeout such that it
+                    // can check that if it should still be listening or not
+                }
+                catch (IOException e)
+                {
+                    Common.log.LogMessage(Thread.currentThread(), "Network error", MyLogger.LogLevel.INFO, e);
+                }
+            }
         }
 
     }
@@ -94,8 +95,7 @@ public class Network
 
         @Override
         @SuppressWarnings("empty-statement")
-        public
-            void run()
+        public void run()
         {
             try
             {
@@ -109,7 +109,7 @@ public class Network
             {
                 try
                 {
-                    serverSocket.setSoTimeout(Server.ENDCHECKFREQUENCY);
+                    serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients)
                     {
@@ -123,11 +123,12 @@ public class Network
                 catch (SocketException e)
                 {
                     ;
-// do nothing; this is an exit due to SoTimeout such that it can check that if it should still be listening or not
+                    // do nothing; this is an exit due to SoTimeout such that it
+                    // can check that if it should still be listening or not
                 }
                 catch (IOException e)
                 {
-                	Server.log.LogMessage(Thread.currentThread().getName(), "Network error", MyLogger.LogLevel.INFO , e);
+                    Common.log.LogMessage(Thread.currentThread().getName(), "Network error", MyLogger.LogLevel.INFO, e);
                 }
             }
         }
@@ -155,11 +156,11 @@ public class Network
         }
         catch (UnsupportedEncodingException e)
         {
-        	Server.log.LogMessage(Thread.currentThread().getName(), "Encoding error", MyLogger.LogLevel.ERROR , e);
+            Common.log.LogMessage(Thread.currentThread(), "Encoding error", MyLogger.LogLevel.ERROR, e);
         }
         catch (IOException e)
         {
-        	Server.log.LogMessage(Thread.currentThread().getName(), "Error sending error", MyLogger.LogLevel.INFO , e);
+            Common.log.LogMessage(Thread.currentThread(), "Error sending error", MyLogger.LogLevel.INFO, e);
         }
     }
 

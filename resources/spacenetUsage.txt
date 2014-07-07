@@ -1,1 +1,1 @@
-Todo: print usage
+Todo: write usage document

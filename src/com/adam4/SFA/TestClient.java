@@ -10,47 +10,46 @@ import java.nio.charset.StandardCharsets;
 
 public class TestClient
 {
-	static Socket s;
-	static OutputStream output;
-	static InputStream input;
+    static Socket s;
+    static OutputStream output;
+    static InputStream input;
 
-	public static void main(String[] args)
-	{
-		String URL="localhost";
-		if (args.length > 0)
-		{
-			URL = args[0];
-		}
-		try
-		{
-			s = new Socket(URL, 9995);
-			System.out.println("connected to: " + URL);
-			output = s.getOutputStream();
-			input = s.getInputStream();
+    public static void main(String[] args)
+    {
+        String URL = "localhost";
+        if (args.length > 0)
+        {
+            URL = args[0];
+        }
+        try
+        {
+            s = new Socket(URL, 9995);
+            System.out.println("connected to: " + URL);
+            output = s.getOutputStream();
+            input = s.getInputStream();
 
-			// 0=c (Connect), 1 = name, 2 = password, 3 = clientType, 4 =
-			// clientVersion
-			final char SEPARATOR = (char) 31;
-			String connect = "c" + SEPARATOR;
-			connect += "Merlin" + SEPARATOR;
-			connect += "AbraKadabra" + SEPARATOR;
-			connect += "DesktopTestCLient" + SEPARATOR;
-			connect += "1.0" + '\n';
+            // 0=c (Connect), 1 = name, 2 = password, 3 = clientType, 4 =
+            // clientVersion
+            final char SEPARATOR = (char) 31;
+            String connect = "c" + SEPARATOR;
+            connect += "Merlin" + SEPARATOR;
+            connect += "AbraKadabra" + SEPARATOR;
+            connect += "DesktopTestCLient" + SEPARATOR;
+            connect += "1.0" + '\n';
 
-			System.out.println(connect);
+            System.out.println(connect);
 
-			output.write((connect.getBytes("UTF-8")));
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					input, StandardCharsets.UTF_8.newDecoder()));
+            output.write((connect.getBytes("UTF-8")));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder()));
 
-			// System.out.println(reader.readLine() + i);
+            // System.out.println(reader.readLine() + i);
 
-			s.close();
-		}
+            s.close();
+        }
 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

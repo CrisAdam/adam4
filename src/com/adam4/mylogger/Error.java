@@ -7,9 +7,9 @@ import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class Error
 {
-	
-	String server;
-	String application;
+
+    String server;
+    String application;
     String thread;
     String message;
     LogLevel level;
@@ -18,8 +18,8 @@ public class Error
 
     Error(String server, String application, String thread, String message, LogLevel level, String trace, Date date)
     {
-    	this.server = server;
-    	this.application = application;
+        this.server = server;
+        this.application = application;
         this.thread = thread;
         this.message = message;
         this.level = level;
@@ -30,7 +30,7 @@ public class Error
     @Override
     public String toString()
     {
-        return  Common.dateFormat.format(date) + "  " +  thread + "  " + message + "  " + level + "  " + trace ;
+        return Common.dateFormat.format(date) + "  " + thread + "  " + message + "  " + level + "  " + trace;
     }
 
 }

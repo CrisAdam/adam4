@@ -1,7 +1,5 @@
 package com.adam4.SFA;
 
-
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,13 +13,13 @@ import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class ClientHandler implements Runnable
 {
-	Socket clientSocket;
-	Client c;
-	
+    Socket clientSocket;
+    Client c;
+
     ClientHandler(Socket connection, Client client)
     {
-    	clientSocket = connection;
-    	c = client;
+        clientSocket = connection;
+        c = client;
     }
 
     private enum MESSAGETYPE
@@ -29,8 +27,7 @@ public class ClientHandler implements Runnable
 
         CONNECT(1), DISCONNECT(2), UPDATEPASSWORD(3), SELECTSHIP(4), SENDINPUT(5);
 
-        private final
-                int index;
+        private final int index;
 
         MESSAGETYPE(int type)
         {
@@ -46,7 +43,8 @@ public class ClientHandler implements Runnable
     public void run()
     {
 
-        BufferedReader input = null;  // not sure if I need the buffering, but having the getLine() is nice
+        BufferedReader input = null; // not sure if I need the buffering, but
+                                     // having the getLine() is nice
         String message = "";
 
         try
@@ -72,59 +70,60 @@ public class ClientHandler implements Runnable
                 message = "error";
                 try
                 {
-                	clientSocket.close();
+                    clientSocket.close();
                 }
                 catch (IOException e1)
                 {
                     e1.printStackTrace();
                 }
-                Server.log.LogMessage(Thread.currentThread().getName(), "unable to close client connection", MyLogger.LogLevel.ERROR, e);
+                Common.log.LogMessage(Thread.currentThread().getName(), "unable to close client connection", MyLogger.LogLevel.ERROR, e);
             }
 
             char switchChar = message.charAt(0);
             switch (switchChar)
             {
-                // CONNECT(c), DISCONNECT(d), UPDATEPASSWORD(u), SELECTSHIP(s), SENDINPUT(i);
-                case 'c':
-                {
-                    connect(message);
-                    continue;
-                }
-                default:
-                {
-                    System.out.println("unsupported message type" + message.charAt(0));
-                    break;
-                }
+            // CONNECT(c), DISCONNECT(d), UPDATEPASSWORD(u), SELECTSHIP(s),
+            // SENDINPUT(i);
+            case 'c':
+            {
+                connect(message);
+                continue;
+            }
+            default:
+            {
+                System.out.println("unsupported message type" + message.charAt(0));
+                break;
+            }
             }
         }
     }
 
     private void connect(String message)
     {
-    	 String[] params = message.split(Common.SEPARATOR);
-         // 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
-         String playerName = params[1];
-         String password = params[2] + playerName;
-         String version = params[4];
-         if (!Common.isGoodUserName(playerName))
-         {
-             System.out.println(message);
-             System.out.println(params[0] + "  " + params[1] + "  " + params[3]);
-             Network.sendError(clientSocket, "bad user name");
-             Server.log.LogMessage(Thread.currentThread(), "bad user name: " + playerName, LogLevel.INFO);
-             return;
-         }
+        String[] params = message.split(Common.SEPARATOR);
+        // 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
+        String playerName = params[1];
+        String password = params[2] + playerName;
+        String version = params[4];
+        if (!Common.isGoodUserName(playerName))
+        {
+            System.out.println(message);
+            System.out.println(params[0] + "  " + params[1] + "  " + params[3]);
+            Network.sendError(clientSocket, "bad user name");
+            Common.log.LogMessage(Thread.currentThread(), "bad user name: " + playerName, LogLevel.INFO);
+            return;
+        }
     }
 
     public void disconnect()
     {
         try
         {
-        	clientSocket.close();
+            clientSocket.close();
         }
         catch (IOException e)
         {
-        	Server.log.LogMessage(Thread.currentThread(), "attempted to close client connection", MyLogger.LogLevel.INFO, e);
+            Common.log.LogMessage(Thread.currentThread(), "attempted to close client connection", MyLogger.LogLevel.INFO, e);
         }
     }
 
