@@ -24,7 +24,7 @@ public class MyLogger
         catch (UnknownHostException e)
         {
             this.server = "UnknownServer";
-            LogMessage(Thread.currentThread(), "Unable to get hostname", LogLevel.ERROR, e);
+            LogMessage(e, LogLevel.ERROR);
         }
         this.application = "unset";
         sorter = new Sorter();
@@ -44,7 +44,7 @@ public class MyLogger
     {
         try
         {
-            LogMessage(Thread.currentThread(), "Logger was not cleanly closed", LogLevel.ERROR);
+            LogMessage("Logger was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally
@@ -60,33 +60,10 @@ public class MyLogger
 
     public enum LogLevel
     {
-
         DEBUG, INFO, WARN, ERROR, OFF;
     }
 
-    /*
-     * static methods
-     * 
-     * This class is guaranteed to be instantiated prior to any of these being
-     * called.
-     */
-
-    public void LogMessage(String thread, String message, LogLevel level)
-    {
-        LogMessage(thread, message, level, "");
-    }
-
-    public void LogMessage(Thread thread, String message, LogLevel level, Exception e)
-    {
-        LogMessage(thread.getName(), message, level, e);
-    }
-
-    public void LogMessage(Thread thread, String message, LogLevel level)
-    {
-        LogMessage(thread.getName(), message, level);
-    }
-
-    public void LogMessage(String thread, String message, LogLevel level, Exception e)
+    public void LogMessage( Exception e, LogLevel level)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(e.getClass().toString());
@@ -97,13 +74,12 @@ public class MyLogger
             sb.append(" -> ");
             sb.append(element.toString());
         }
-
-        LogMessage(thread, message, level, sb.toString());
+        LogMessage(sb.toString(), level);
     }
 
-    public void LogMessage(String thread, String message, LogLevel level, String trace)
+    public void LogMessage(String message, LogLevel level)
     {
-        sorter.addError(new Error(server, application, thread, message, level, trace, Common.getTime()));
+        sorter.addError(new Error(server, application, Thread.currentThread().getName(), message, level, Common.getTime()));
     }
 
     public void setApplication(String server)

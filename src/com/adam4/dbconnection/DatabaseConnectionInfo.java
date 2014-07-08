@@ -1,4 +1,4 @@
-package com.adam4.dbconnectionmanager;
+package com.adam4.dbconnection;
 
 public class DatabaseConnectionInfo
 {

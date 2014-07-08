@@ -5,4 +5,4 @@
  * @author Cristian Adam
  *
  */
-package com.adam4.dbconnectionmanager;
+package com.adam4.dbconnection;

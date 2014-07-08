@@ -7,8 +7,7 @@ import com.adam4.common.Common;
 import com.adam4.mylogger.MyLogger;
 
 /**
- * This allows game servers to connect so that the spacenet can send players to
- * them
+ * This allows game servers to connect so that the spacenet can send players to them
  */
 public class GameServerListener implements Runnable
 {
@@ -26,7 +25,7 @@ public class GameServerListener implements Runnable
         }
         catch (Exception e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Unable to open gameServer Listener socket", MyLogger.LogLevel.ERROR, e);
+            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
         }
     }
 

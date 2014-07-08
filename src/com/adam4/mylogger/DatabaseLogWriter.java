@@ -3,7 +3,8 @@ package com.adam4.mylogger;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.adam4.common.Common;
-import com.adam4.dbconnectionmanager.DatabaseConnectionManager;
+import com.adam4.dbconnection.DatabaseConnectionManager;
+import com.adam4.dbconnection.SQLRequest;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class DatabaseLogWriter implements iLogWriter
@@ -36,16 +37,15 @@ public class DatabaseLogWriter implements iLogWriter
 
         private boolean writeError(Error error)
         {
-            StringBuilder sql = new StringBuilder("INSERT INTO `SFASchema`.`ErrorLoggingTable` (`Time`, `ThreadName`, `Error`, `Level`, `StackTrace`) VALUES ('");
-            sql.append(error.date.getTime() + "', '");
-            sql.append(error.server + "', '");
-            sql.append(error.application + "', '");
-            sql.append(error.thread + "', '");
-            sql.append(error.message + "', '");
-            sql.append(error.level + "', '");
-            sql.append(error.trace + "');");
+            SQLRequest req = new SQLRequest("INSERT INTO `SFASchema`.`ErrorLoggingTable` (`Time`, `ThreadName`, `Error`, `Level`) VALUES (?,?,?,?,?,?)");
+            req.add(error.date);
+            req.add(error.server);
+            req.add(error.application);
+            req.add(error.thread);
+            req.add(error.message);
+            req.add(error.level.toString());
 
-            return dbConManager.writeData(sql.toString());
+            return dbConManager.writeData(req);
         }
 
         @Override
@@ -94,7 +94,7 @@ public class DatabaseLogWriter implements iLogWriter
     {
         try
         {
-            Common.log.LogMessage(Thread.currentThread(), "DatabaseLogger was not cleanly closed", LogLevel.ERROR);
+            Common.log.LogMessage("DatabaseLogger was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally

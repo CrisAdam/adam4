@@ -53,7 +53,7 @@ public class Client
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Client unable to disconnect", LogLevel.WARN, e);
+            Common.log.LogMessage(e, LogLevel.WARN);
         }
     }
 

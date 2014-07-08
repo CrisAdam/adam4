@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.adam4.common.Common;
-import com.adam4.dbconnectionmanager.DatabaseConnectionPool;
+import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
@@ -33,7 +33,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Unable to check if player: " + playerName + " exists", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -57,7 +57,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Unable to set Player Data", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
         }
 
     }
@@ -105,7 +105,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Unable to check if player: " + playerName + " exists", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -125,7 +125,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Unable to check if ability: " + shipID + "." + abilityName + " exists", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
             return false;
         }
     }

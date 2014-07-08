@@ -1,6 +1,7 @@
-package com.adam4.dbconnectionmanager;
+package com.adam4.dbconnection;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +18,7 @@ public class DatabaseConnectionManager
     private DatabaseConnectionPool localConPool;
     private Thread pendingQueueThread;
     private Thread confirmedQueueThread;
-    private LinkedList<String> pendingQueue;  // temporary holding place for requests to be saved until the majority has saved them
+    private LinkedList<String> pendingQueue; // temporary holding place for requests to be saved until the majority has saved them
     private LinkedList<String> confirmedQueue;// temporary holding place for requests that the majority has decided to commit
 
     public DatabaseConnectionManager(DatabaseConnectionPool localDB, LinkedList<SeparatedURL> managerPoolURLs)
@@ -31,7 +32,7 @@ public class DatabaseConnectionManager
             pendingQueueThread.start();
             confirmedQueueThread = new Thread(confirmedQueue());
             confirmedQueueThread.start();
-            
+
         }
 
     }
@@ -42,7 +43,7 @@ public class DatabaseConnectionManager
         {
             System.out.println("pending + " + i);
         }
-        
+
         return null;
     }
 
@@ -90,7 +91,7 @@ public class DatabaseConnectionManager
         }
     }
 
-    public Boolean writeData(String query)
+    public Boolean writeData(SQLRequest request)
     {
         if (!isOnline())
         {
@@ -99,46 +100,38 @@ public class DatabaseConnectionManager
 
         if (managerPool.size() == 0)
         {
-            return writeLocalData(query);
+            return writeLocalData(request);
         }
-        writeDistributedData(query);
+        writeDistributedData(request);
         return false;
     }
 
-    private boolean writeDistributedData(String query)
+    private boolean writeDistributedData(SQLRequest request)
     {
-        boolean[] succeeded = new boolean[managerPool.size()];
-        Arrays.fill(succeeded, false);
 
-        for (int i = 0; i < succeeded.length; i++)
-        {
-            if (managerPool.get(i).isConnected())
-            {
-                succeeded[i] = managerPool.get(i).attemptWrite(query);
-            }
-        }
-
-        boolean localStatus = writeLocalData(query);
-
-        for (DatabaseConnectionManagerConnection con : managerPool)
-        {
-            if (con.isConnected())
-            {
-                con.attemptWrite(query);
-            }
-        }
-        Common.log.LogMessage(Thread.currentThread(), "distributed writes not yet implemented", LogLevel.ERROR);
-
+        Common.log.LogMessage("distributed writes not yet implemented", LogLevel.ERROR);
         return false;
-
+        /*
+         * todo: finish these
+         * 
+         * boolean[] succeeded = new boolean[managerPool.size()]; Arrays.fill(succeeded, false);
+         * 
+         * for (int i = 0; i < succeeded.length; i++) { if (managerPool.get(i).isConnected()) { succeeded[i] = managerPool.get(i).attemptWrite(request); } }
+         * 
+         * boolean localStatus = writeLocalData(request);
+         * 
+         * for (DatabaseConnectionManagerConnection con : managerPool) { if (con.isConnected()) { con.attemptWrite(request); } } Common.log.LogMessage(Thread.currentThread(), "distributed writes not yet implemented", LogLevel.ERROR);
+         * 
+         * return false;
+         */
     }
 
-    private boolean attemptWriteLocal(String query)
+    private boolean attemptWriteLocal(SQLRequest request)
     {
         return false;
     }
 
-    private Boolean writeLocalData(String query)
+    private Boolean writeLocalData(SQLRequest request)
     {
         if (!localConPool.isConnected())
         {
@@ -147,12 +140,13 @@ public class DatabaseConnectionManager
         Connection con = localConPool.getConnection();
         try
         {
-            Statement st = con.createStatement();
-            return st.execute(query);
+            PreparedStatement pst = con.prepareCall(request.statement);
+            request.prepare(pst);
+            return pst.execute();
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "SQL error", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -165,7 +159,7 @@ public class DatabaseConnectionManager
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "SQL close error", LogLevel.ERROR, e);
+            Common.log.LogMessage(e, LogLevel.ERROR);
         }
     }
 

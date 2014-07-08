@@ -1,4 +1,4 @@
-package com.adam4.dbconnectionmanager;
+package com.adam4.dbconnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -85,7 +85,7 @@ public class DatabaseConnectionPool
     {
         try
         {
-            Common.log.LogMessage(Thread.currentThread(), "ConnectionPool was not cleanly closed", LogLevel.ERROR);
+            Common.log.LogMessage("ConnectionPool was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally

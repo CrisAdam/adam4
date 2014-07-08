@@ -76,7 +76,7 @@ public class ClientHandler implements Runnable
                 {
                     e1.printStackTrace();
                 }
-                Common.log.LogMessage(Thread.currentThread().getName(), "unable to close client connection", MyLogger.LogLevel.ERROR, e);
+                Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
             }
 
             char switchChar = message.charAt(0);
@@ -109,8 +109,8 @@ public class ClientHandler implements Runnable
         {
             System.out.println(message);
             System.out.println(params[0] + "  " + params[1] + "  " + params[3]);
-            Network.sendError(clientSocket, "bad user name");
-            Common.log.LogMessage(Thread.currentThread(), "bad user name: " + playerName, LogLevel.INFO);
+            Network.sendError(clientSocket, "bad user name: " + playerName);
+            Common.log.LogMessage("bad user name: " + playerName, LogLevel.INFO);
             return;
         }
     }
@@ -123,7 +123,7 @@ public class ClientHandler implements Runnable
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "attempted to close client connection", MyLogger.LogLevel.INFO, e);
+            Common.log.LogMessage(e, MyLogger.LogLevel.INFO);
         }
     }
 

@@ -6,11 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.LinkedList;
+
+import com.adam4.common.BlockOnRunFile;
 import com.adam4.common.Common;
 import com.adam4.common.SeparatedURL;
-import com.adam4.dbconnectionmanager.DatabaseConnectionInfo;
-import com.adam4.dbconnectionmanager.DatabaseConnectionManager;
-import com.adam4.dbconnectionmanager.DatabaseConnectionPool;
+import com.adam4.dbconnection.DatabaseConnectionInfo;
+import com.adam4.dbconnection.DatabaseConnectionManager;
+import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.mylogger.ConsoleLogWriter;
 import com.adam4.mylogger.DatabaseLogWriter;
 import com.adam4.mylogger.FileLogWriter;
@@ -19,13 +21,12 @@ public class SpaceNetServer
 {
 
     private static final int maxIdleClientConnections = 3;
-    public static final int ENDCHECKFREQUENCY = 100; // polling frequency in ms
-                                                     // for network to close
-                                                     // socket
+    public static final int ENDCHECKFREQUENCY = 100; // polling frequency in ms for network to close socket
 
     // class variables
-    static DatabaseConnectionManager clientDatabaseManager;
-    static DatabaseConnectionManager serverDatabaseManager;
+    static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
+    static DatabaseConnectionManager serverDatabaseManager; // used to authenticate other servers
+    private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SpaceNetServer.run";
 
     public static void main(String[] args) throws Exception
     {
@@ -35,6 +36,11 @@ public class SpaceNetServer
             // do not run program if it is given invalid arguments
             return;
         }
+
+        BlockOnRunFile block = new BlockOnRunFile(runFilePath);
+        block.block();
+        
+        Common.log.close();
 
     }
 

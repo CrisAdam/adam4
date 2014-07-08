@@ -25,11 +25,11 @@ public class Common
     {
         String output = "hash failure";
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
-        for (int i = 0; i < 50000; i++)
-        {
+        for (int i = 0; i < 100000; i++) // note: 1000000 is hard-coded such that it does not change!
+        { // any change would render all existing passwords useless!
             digest.update(password.getBytes());
             digest.update(new String("Saltd2815980fcb9635bc8a972f1902e1f1c18be889bf79b5c72372ca37730df9ab3cab5ad983860b80501007325eba2784d4a97814bedfa95e73259a1179733").getBytes());
-        }
+        } // likewise the salt is also hard-coded such that it does not change
         byte[] byteOutput = digest.digest(password.getBytes());
         BigInteger bigInt = new BigInteger(1, byteOutput);
         output = bigInt.toString(16);

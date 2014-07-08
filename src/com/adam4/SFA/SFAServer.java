@@ -13,9 +13,10 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.nio.file.StandardWatchEventKinds;
 
+import com.adam4.common.BlockOnRunFile;
 import com.adam4.common.Common;
-import com.adam4.dbconnectionmanager.DatabaseConnectionManager;
-import com.adam4.dbconnectionmanager.DatabaseConnectionPool;
+import com.adam4.dbconnection.DatabaseConnectionManager;
+import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.mylogger.ConsoleLogWriter;
 import com.adam4.mylogger.DatabaseLogWriter;
 import com.adam4.mylogger.FileLogWriter;
@@ -43,7 +44,7 @@ public class SFAServer
     private static ConcurrentLinkedQueue<Client> clients = new ConcurrentLinkedQueue<Client>();
     private static Network network = new Network();
     private static final int maxIdleClientConnections = 3;
-    private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "run";
+    private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
     private static boolean running = true;
     private static ConcurrentLinkedQueue<iClientDataResource> clientDataResources = new ConcurrentLinkedQueue<>();
 
@@ -56,12 +57,12 @@ public class SFAServer
             return;
         }
 
-        Common.log.LogMessage(Thread.currentThread(), "System started", LogLevel.DEBUG);
+        Common.log.LogMessage("SFA Server started", LogLevel.DEBUG);
 
         // the run file is so that the server can (softly) terminate the program
         // by deleting it
-        makeRunFile(runFilePath);
-        watchRunFile();
+        BlockOnRunFile block = new BlockOnRunFile(runFilePath);
+        block.block();
 
         endServer();
         Common.log.close();
@@ -89,66 +90,6 @@ public class SFAServer
         Game temp = new Game();
         temp.addClients(clients);
         clients.removeAll(clients);
-    }
-
-    private static void watchRunFile()
-    {
-        try
-        {
-            Path path = FileSystems.getDefault().getPath(runFilePath.substring(0, runFilePath.lastIndexOf(FileSystems.getDefault().getSeparator())));
-            System.out.println(runFilePath.substring(0, runFilePath.lastIndexOf(FileSystems.getDefault().getSeparator())));
-            WatchService watcher = FileSystems.getDefault().newWatchService();
-            WatchKey key;
-            key = path.register(watcher, StandardWatchEventKinds.ENTRY_DELETE);
-            // stall until the game is supposed to end
-            // reset key to allow new events to be detected
-            while (key.reset())
-            {
-                try
-                {
-                    for (WatchEvent<?> event : key.pollEvents())
-                    {
-                        WatchEvent.Kind<?> kind = event.kind();
-                        if (kind == StandardWatchEventKinds.OVERFLOW)
-                        {
-                            Common.log.LogMessage(Thread.currentThread(), "File watcher overflow", LogLevel.INFO);
-                            if (!run.exists())
-                            {
-                                running = false;
-                            }
-                            break;
-                        }
-                        if (kind == StandardWatchEventKinds.ENTRY_DELETE)
-                        {
-                            @SuppressWarnings("unchecked")
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                            Path filename = ev.context();
-                            if (filename.toAbsolutePath().toString().equals(runFilePath))
-                            {
-                                Common.log.LogMessage(Thread.currentThread(), "Run file has been deleted", LogLevel.INFO);
-                                running = false;
-                                break;
-                            }
-                        }
-
-                    }
-                    if (!running)
-                    {
-                        watcher.close();
-                        break;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Common.log.LogMessage(Thread.currentThread(), "File watcher error", LogLevel.INFO, e);
-                    continue;
-                }
-            }// end while loop
-        }
-        catch (IOException e1)
-        {
-            Common.log.LogMessage(Thread.currentThread(), "File watcher error", LogLevel.ERROR, e1);
-        }
     }
 
     private static boolean handleCLI(String[] args) throws Exception
@@ -214,20 +155,6 @@ public class SFAServer
             System.out.println(line);
         }
         br.close();
-    }
-
-    private static void makeRunFile(String runFilePath)
-    {
-
-        run = new File(runFilePath);
-        try
-        {
-            run.createNewFile();
-        }
-        catch (IOException e)
-        {
-            Common.log.LogMessage(Thread.currentThread().getName(), "unable to create run file", MyLogger.LogLevel.ERROR, e);
-        }
     }
 
     static void addPlayer(Client client)

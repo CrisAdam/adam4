@@ -51,7 +51,7 @@ public class Network
             }
             catch (Exception e)
             {
-                Common.log.LogMessage(Thread.currentThread(), "Unable to start ClientListener socket", MyLogger.LogLevel.ERROR, e);
+                Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
             }
         }
 
@@ -81,7 +81,7 @@ public class Network
                 }
                 catch (IOException e)
                 {
-                    Common.log.LogMessage(Thread.currentThread(), "Network error", MyLogger.LogLevel.INFO, e);
+                    Common.log.LogMessage(e, MyLogger.LogLevel.INFO);
                 }
             }
         }
@@ -94,7 +94,6 @@ public class Network
         ServerSocket serverSocket = null;
 
         @Override
-        @SuppressWarnings("empty-statement")
         public void run()
         {
             try
@@ -128,7 +127,7 @@ public class Network
                 }
                 catch (IOException e)
                 {
-                    Common.log.LogMessage(Thread.currentThread().getName(), "Network error", MyLogger.LogLevel.INFO, e);
+                    Common.log.LogMessage(e, MyLogger.LogLevel.INFO);
                 }
             }
         }
@@ -156,11 +155,11 @@ public class Network
         }
         catch (UnsupportedEncodingException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Encoding error", MyLogger.LogLevel.ERROR, e);
+            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(Thread.currentThread(), "Error sending error", MyLogger.LogLevel.INFO, e);
+            Common.log.LogMessage(e, MyLogger.LogLevel.WARN);
         }
     }
 

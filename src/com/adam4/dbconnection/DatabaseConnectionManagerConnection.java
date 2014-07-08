@@ -1,4 +1,4 @@
-package com.adam4.dbconnectionmanager;
+package com.adam4.dbconnection;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -35,7 +35,7 @@ public class DatabaseConnectionManagerConnection
         this.isConnected = isConnected;
     }
 
-    public boolean attemptWrite(String query)
+    public boolean attemptWrite(SQLRequest request)
     {
         // TODO Auto-generated method stub
         return false;

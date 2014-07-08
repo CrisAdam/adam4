@@ -15,7 +15,7 @@ public class TestMyLogger
             // log.addLogWriter(new DatabaseLogWriter(args[0]));
         }
 
-        Common.log.LogMessage(Thread.currentThread().getName(), "Test log message", MyLogger.LogLevel.DEBUG);
+        Common.log.LogMessage("Test log message", MyLogger.LogLevel.DEBUG);
 
         Common.log.close();
     }
