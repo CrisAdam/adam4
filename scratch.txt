@@ -1,0 +1,17 @@
+lnx261 OR: ec2-54-191-73-91.us-west-2.compute.amazonaws.com
+#
+lnx262 VI: ec2-54-209-64-84.compute-1.amazonaws.com
+#
+lnx263 CA: ec2-54-183-100-220.us-west-1.compute.amazonaws.com
+# unreal IRC server :9995
+ircP@ssword
+/home/ec2-user/ircServer/Unreal3.2.10.3/
+
+/nick lnx263
+/connect  ec2-54-183-100-220.us-west-1.compute.amazonaws.com 9995
+/join #chan
+
+keytool -genkey -keystore AuthSrv01Keystore -keyalg RSA -keysize 8192
+<keystore password>
+
+http://stilius.net/java/java_ssl.php

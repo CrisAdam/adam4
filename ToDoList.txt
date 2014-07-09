@@ -1,0 +1,4 @@
+1. parse irc 
+2. accept irc commands
+3. turn on ssl for irc
+4. connect to multiple servers with irc
