@@ -39,7 +39,7 @@ public class SpaceNetServer
 
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
-        
+
         Common.log.close();
 
     }

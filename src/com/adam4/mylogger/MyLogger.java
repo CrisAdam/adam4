@@ -63,7 +63,7 @@ public class MyLogger
         DEBUG, INFO, WARN, ERROR, OFF;
     }
 
-    public void LogMessage( Exception e, LogLevel level)
+    public void LogMessage(Exception e, LogLevel level)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(e.getClass().toString());

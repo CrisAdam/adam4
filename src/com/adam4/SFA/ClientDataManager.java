@@ -1,7 +1,5 @@
 package com.adam4.SFA;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class ClientDataManager
 {
 

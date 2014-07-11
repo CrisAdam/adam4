@@ -1,6 +1,8 @@
 package com.adam4.common;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -19,6 +21,11 @@ public class Common
     public static Date getTime()
     {
         return new Date(new Date().getTime() - TimeZone.getDefault().getRawOffset());
+    }
+
+    public static String getHostName() throws UnknownHostException
+    {
+        return InetAddress.getLocalHost().getHostName();
     }
 
     public static String hashPassword(String password) throws NoSuchAlgorithmException

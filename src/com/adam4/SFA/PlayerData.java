@@ -20,7 +20,7 @@ public class PlayerData
     int asteroidCrashes;
     Date lastUpdate;
 
-    PlayerData(String name)
+    public PlayerData(String name)
     {
         userName = name;
     }
