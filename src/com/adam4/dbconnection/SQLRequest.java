@@ -1,8 +1,8 @@
 package com.adam4.dbconnection;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 
 public class SQLRequest
@@ -17,9 +17,9 @@ public class SQLRequest
         this.statement = statement;
     }
 
-    public void add(java.sql.Date date)
+    public void add(Timestamp time)
     {
-        fields.add(new SQLFieldDate(fields.size(), date));
+        fields.add(new SQLFieldTimestamp(fields.size(), time));
     }
 
     public void add(String s)
@@ -45,21 +45,21 @@ public class SQLRequest
         void addToStatement(PreparedStatement statement) throws SQLException;
     }
 
-    public class SQLFieldDate implements SQLField
+    public class SQLFieldTimestamp implements SQLField
     {
-        private Date date;
+        private Timestamp time;
         private int index;
 
-        SQLFieldDate(int index, java.sql.Date date)
+        SQLFieldTimestamp(int index, Timestamp time)
         {
             this.index = index;
-            this.date = date;
+            this.time = time;
         }
 
         @Override
         public void addToStatement(PreparedStatement statement) throws SQLException
         {
-            statement.setDate(index, date);
+            statement.setTimestamp(index, time);
         }
     }
 
@@ -97,12 +97,6 @@ public class SQLRequest
         {
             statement.setInt(index, x);
         }
-    }
-
-    public void add(java.util.Date date)
-    {
-        // convert from java date to SQL date
-        add(new java.sql.Date(date.getTime()));
     }
 
 }

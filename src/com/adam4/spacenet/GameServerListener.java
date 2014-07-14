@@ -25,7 +25,7 @@ public class GameServerListener implements Runnable
         }
         catch (Exception e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
         }
     }
 

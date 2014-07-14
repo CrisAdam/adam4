@@ -1,20 +1,20 @@
 package com.adam4.spacenet;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 
 import com.adam4.common.Common;
+import com.adam4.dbconnection.SQLRequest;
 import com.adam4.irc.GenericIRCMessage;
 import com.adam4.irc.IRC;
 import com.adam4.irc.IRCError;
@@ -32,10 +32,22 @@ public class ClientHandler implements Runnable
     private String userName;
     private boolean invisible;
     private boolean away;
+    private int privilegeLevel;
+
+    private ArrayList<String> channels;
+    private ArrayList<String> groups;
+
+    private int sendLevel;
+    private LinkedList<Date> timeRecieved; // used for anti-spam/flood
 
     ClientHandler(Socket s)
     {
+        channels = new ArrayList<>();
+        groups = new ArrayList<>();
         this.s = s;
+        timeRecieved = new LinkedList<Date>();
+        privilegeLevel = 0;
+        sendLevel = 10000; // 10 messages in 10 seconds average
     }
 
     @Override
@@ -50,7 +62,7 @@ public class ClientHandler implements Runnable
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
         }
         while (!s.isClosed())
         {
@@ -65,16 +77,16 @@ public class ClientHandler implements Runnable
             }
             catch (IOException e)
             {
-                message = "error";  // not sure if needed
+                message = "error"; // not sure if needed
                 try
                 {
                     s.close();
                 }
                 catch (IOException e1)
                 {
-                    Common.log.LogMessage(e1, MyLogger.LogLevel.ERROR);
+                    Common.log.logMessage(e1, MyLogger.LogLevel.ERROR);
                 }
-                Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+                Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
             }
             try
             {
@@ -82,20 +94,23 @@ public class ClientHandler implements Runnable
             }
             catch (UnknownHostException e)
             {
-                Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+                Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
             }
         }
+        isLoggedIn = false;
+        SpaceNetServer.disconnect(this);
     }
 
     void handleRequest(ParsedMessage parsed) throws UnknownHostException
     {
+        preventSpam();
         switch (parsed.command)
         {
         case ("AWAY"):
             away(parsed);
             break;
         case ("HELP"):
-            help(parsed);
+            help();
             break;
         case ("INFO"):
             info(parsed);
@@ -125,7 +140,7 @@ public class ClientHandler implements Runnable
             mode(parsed);
             break;
         case ("MOTD"):
-            motd(parsed);
+            motd();
             break;
         case ("NAMES"):
             names(parsed);
@@ -200,48 +215,53 @@ public class ClientHandler implements Runnable
         }
     } // end handleRequest
 
+    private void preventSpam()
+    {
+        timeRecieved.add(new Date());
+        if (timeRecieved.peek().getTime() - timeRecieved.getLast().getTime() > sendLevel)
+        {
+            while (timeRecieved.size() > 10)
+            {
+                timeRecieved.pop();
+            }
+        }
+        else if (timeRecieved.peek().getTime() - timeRecieved.getLast().getTime() < (sendLevel * 1.2))
+        {
+            try
+            {
+                sendIRCMessage(new IRCError("Flood error: you may only send an average of " + (sendLevel / 10000) + " messages per second, pausing", 540));
+                Thread.sleep(sendLevel / 1000);
+            }
+            catch (InterruptedException e)
+            {
+                Common.log.logMessage(e, LogLevel.INFO);
+            }
+        }
+        else
+        {
+            sendIRCMessage(new IRCError("Flood warning: you may only send an average of " + (sendLevel / 1000) + " messages per second", 540));
+        }
+    }
+
     private void away(ParsedMessage parsed)
     {
         away = !away;
-        // TODO notify all who are talking directly with this person
-
+        SpaceNetServer.away(this, away);
     }
 
-    private void help(ParsedMessage parsed)
+    private void help()
     {
-        BufferedReader br;
-        try
-        {
-            br = new BufferedReader(new FileReader(System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "resources" + FileSystems.getDefault().getSeparator() + "spacenetHelp.txt"));
-            String line = null;
-            while ((line = br.readLine()) != null)
-            {
-                System.out.println(line);
-            }
-            br.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        sendIRCMessage("help");
+        sendIRCMessage(Common.replaceNewLines(Common.readResourceFile("spacenetHelp.txt")));
     }
 
     private void info(ParsedMessage parsed)
     {
-        // TODO Auto-generated method stub
-
+        sendIRCMessage(SpaceNetServer.version + " " + Common.getHostName(), 371);
     }
 
     private void ison(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
-
     }
 
     private void invite(ParsedMessage parsed)
@@ -281,12 +301,6 @@ public class ClientHandler implements Runnable
 
     }
 
-    private void time(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     private void user(ParsedMessage parsed)
     {
         // connect
@@ -299,13 +313,30 @@ public class ClientHandler implements Runnable
             {
                 // user does not exist, insert into database
                 String create = "INSERT INTO AUTH.CLIENT (ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE) VALUES ( /* ACCESSLEVEL */ /* CLIENTNAME */, /* HASHEDPASSWORD */, /* LASTLOGINDATE */ );";
+                SQLRequest insert = new SQLRequest(create);
+                isLoggedIn = SpaceNetServer.clientDatabaseManager.writeData(insert);
+                if (isLoggedIn)
+                {
+                    sendIRCMessage("Welcome to the SpaceNet IRC" + userName, 001);
+                    motd();
+                }
+            }
+            else if (result.getString("HASHED_PASSWORD").equals(hashedPassword))
+            {
+                motd();
+                isLoggedIn = true;
+            }
+            else
+            {
+                sendIRCMessage(new IRCError("Password incorrect", 464));
             }
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            isLoggedIn = false;
+            Common.log.logMessage(e, LogLevel.ERROR);
         }
-        ;
+
         if (parsed.args[0].startsWith("8"))
         {
             invisible = true;
@@ -334,30 +365,6 @@ public class ClientHandler implements Runnable
 
     }
 
-    private void summon(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void stats(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void silence(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void quit(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     private void privmsg(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
@@ -366,35 +373,11 @@ public class ClientHandler implements Runnable
 
     private void pong(ParsedMessage parsed)
     {
-        // TODO Auto-generated method stub
+        // TODO check that it matches a requested ping, otherwise disregard
 
     }
 
     private void ping(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void part(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void notice(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void names(ParsedMessage parsed)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void motd(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
@@ -406,20 +389,81 @@ public class ClientHandler implements Runnable
 
     }
 
-    private void pass(ParsedMessage parsed)
+    private void motd()
     {
-        try
+        String motd = Common.readResourceFile("motd.txt");
+        if (motd.equals("motd.txt file not found"))
         {
-            hashedPassword = Common.hashPassword(parsed.args[0]);
+            sendIRCMessage(new IRCError("MOTD file is missing", 422));
         }
-        catch (NoSuchAlgorithmException e)
+        else
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            sendIRCMessage(motd);
+        }
+
+    }
+
+    private void names(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+        // http://tools.ietf.org/html/rfc2812#section-3.2.5
+
+    }
+
+    private void nick(ParsedMessage parsed)
+    {
+        if (Common.isGoodUserName(parsed.args[0]))
+        {
+            nickName = parsed.args[0];
+        }
+        else
+        {
+            sendIRCMessage("invalid nickname", 432);
         }
     }
 
-    private void whois(ParsedMessage parsed)
+    private void notice(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void pass(ParsedMessage parsed)
+    {
+        hashedPassword = Common.hashPassword(parsed.args[0]);
+    }
+
+    private void part(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void quit(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void silence(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void stats(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void summon(ParsedMessage parsed)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void time(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
@@ -431,6 +475,11 @@ public class ClientHandler implements Runnable
 
     }
 
+    private void whois(ParsedMessage parsed)
+    {
+        // TODO : need sample message
+    }
+
     private void watch(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
@@ -439,19 +488,12 @@ public class ClientHandler implements Runnable
 
     private void wallops(ParsedMessage parsed)
     {
-        // TODO Auto-generated method stub
-
+        SpaceNetServer.wallops(userName, parsed.trailing);
     }
 
     private void version(ParsedMessage parsed)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void nick(ParsedMessage parsed)
-    {
-        hashedPassword = parsed.args[0];
+        sendIRCMessage("SpaceNet Server v" + SpaceNetServer.version, 351);
     }
 
     public void sendIRCMessage(String message)
@@ -462,7 +504,19 @@ public class ClientHandler implements Runnable
         }
         catch (UnknownHostException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
+        }
+    }
+
+    public void sendIRCMessage(String message, int number)
+    {
+        try
+        {
+            sendIRCMessage(new GenericIRCMessage(message, number));
+        }
+        catch (UnknownHostException e)
+        {
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
         }
     }
 
@@ -474,11 +528,11 @@ public class ClientHandler implements Runnable
         }
         catch (UnsupportedEncodingException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.WARN);
+            Common.log.logMessage(e, MyLogger.LogLevel.WARN);
         }
     }
 }

@@ -57,7 +57,7 @@ public class SFAServer
             return;
         }
 
-        Common.log.LogMessage("SFA Server started", LogLevel.DEBUG);
+        Common.log.logMessage("SFA Server started", LogLevel.DEBUG);
 
         // the run file is so that the server can (softly) terminate the program
         // by deleting it

@@ -53,7 +53,7 @@ public class Client
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(e, LogLevel.WARN);
+            Common.log.logMessage(e, LogLevel.WARN);
         }
     }
 

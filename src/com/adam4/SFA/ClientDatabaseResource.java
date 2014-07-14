@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import com.adam4.common.Common;
 import com.adam4.dbconnection.DatabaseConnectionPool;
-import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class ClientDatabaseResource implements iClientDataResource
@@ -33,7 +32,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -57,7 +56,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
         }
 
     }
@@ -105,7 +104,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -125,7 +124,7 @@ public class ClientDatabaseResource implements iClientDataResource
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
             return false;
         }
     }

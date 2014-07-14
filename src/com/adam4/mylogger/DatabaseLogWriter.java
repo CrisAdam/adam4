@@ -38,7 +38,7 @@ public class DatabaseLogWriter implements iLogWriter
         private boolean writeError(Error error)
         {
             SQLRequest req = new SQLRequest("INSERT INTO `SFASchema`.`ErrorLoggingTable` (`Time`, `ThreadName`, `Error`, `Level`) VALUES (?,?,?,?,?,?)");
-            req.add(error.date);
+            req.add(error.time);
             req.add(error.server);
             req.add(error.application);
             req.add(error.thread);
@@ -94,7 +94,7 @@ public class DatabaseLogWriter implements iLogWriter
     {
         try
         {
-            Common.log.LogMessage("DatabaseLogger was not cleanly closed", LogLevel.ERROR);
+            Common.log.logMessage("DatabaseLogger was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally

@@ -3,14 +3,16 @@ package com.adam4.irc;
 import java.net.UnknownHostException;
 
 import com.adam4.common.Common;
+import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class IRCError implements iIRCMessage
 {
     String error;
 
-    private String getPrefix() throws UnknownHostException
+    private String getPrefix()
     {
         return ":" + Common.getHostName() + " ";
+
     }
 
     private int validateNum(int num)
@@ -34,12 +36,12 @@ public class IRCError implements iIRCMessage
         return (':' + s.replaceAll("(\\r|\\n)", "") + ' ');
     }
 
-    public IRCError(String error) throws UnknownHostException
+    public IRCError(String error)
     {
         this.error = getPrefix() + validateError(error) + "400";
     }
 
-    public IRCError(String error, int num) throws UnknownHostException
+    public IRCError(String error, int num)
     {
         this.error = getPrefix() + validateError(error) + validateNum(num);
     }

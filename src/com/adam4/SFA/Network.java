@@ -51,7 +51,7 @@ public class Network
             }
             catch (Exception e)
             {
-                Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+                Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
             }
         }
 
@@ -81,7 +81,7 @@ public class Network
                 }
                 catch (IOException e)
                 {
-                    Common.log.LogMessage(e, MyLogger.LogLevel.INFO);
+                    Common.log.logMessage(e, MyLogger.LogLevel.INFO);
                 }
             }
         }
@@ -127,7 +127,7 @@ public class Network
                 }
                 catch (IOException e)
                 {
-                    Common.log.LogMessage(e, MyLogger.LogLevel.INFO);
+                    Common.log.logMessage(e, MyLogger.LogLevel.INFO);
                 }
             }
         }
@@ -155,11 +155,11 @@ public class Network
         }
         catch (UnsupportedEncodingException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.ERROR);
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
         }
         catch (IOException e)
         {
-            Common.log.LogMessage(e, MyLogger.LogLevel.WARN);
+            Common.log.logMessage(e, MyLogger.LogLevel.WARN);
         }
     }
 

@@ -1,11 +1,9 @@
 package com.adam4.spacenet;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.adam4.common.BlockOnRunFile;
 import com.adam4.common.Common;
@@ -19,15 +17,22 @@ import com.adam4.mylogger.FileLogWriter;
 
 public class SpaceNetServer
 {
-
+    // constants
+    public final static String version = "1.0";
     private static final int maxIdleClientConnections = 3;
     public static final int ENDCHECKFREQUENCY = 100; // polling frequency in ms for network to close socket
 
     // class variables
     static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
-    static DatabaseConnectionManager serverDatabaseManager; // used to authenticate other servers
+
+    // private variables
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SpaceNetServer.run";
     private static ClientListener clientListener;
+    private static ServerListener serverListener;
+    private static ConcurrentLinkedQueue<ClientHandler> connectedClients;
+    private static ConcurrentLinkedQueue<ServerHandler> connectedServers;
+    private static boolean isMaster = false;
+    private static boolean isConnectedToMajority = false;
 
     public static void main(String[] args) throws Exception
     {
@@ -37,8 +42,10 @@ public class SpaceNetServer
             // do not run program if it is given invalid arguments
             return;
         }
-        
+        connectedClients = new ConcurrentLinkedQueue();
         clientListener = new ClientListener();
+
+        serverListener = new ServerListener();
 
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
@@ -76,10 +83,6 @@ public class SpaceNetServer
             case "-clientdatabase":
                 clientDatabaseManager = new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
                 break;
-            case "-sdb":
-            case "-serverdatabase":
-                serverDatabaseManager = new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
-                break;
             case "-r":
             case "-run":
                 String runFilePath = args[++i];
@@ -91,21 +94,29 @@ public class SpaceNetServer
             case "-h":
             case "-help":
             default:
-                printUsage();
+                System.out.println(Common.readResourceFile("spacenetUsage.txt"));
                 return false;
             }
         }
         return true;
     } // end CLI processing
 
-    private static void printUsage() throws IOException
+    public static void away(ClientHandler clientHandler, boolean away)
     {
-        BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "resources" + FileSystems.getDefault().getSeparator() + "spacenetUsage.txt"));
-        String line = null;
-        while ((line = br.readLine()) != null)
-        {
-            System.out.println(line);
-        }
-        br.close();
+        // TODO for each person who is friends with caller, update display status
+
     }
+
+    public static void disconnect(ClientHandler clientHandler)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public static void wallops(String sourceUser, String message)
+    {
+        // TODO for each operator, send then the message
+
+    }
+
 }

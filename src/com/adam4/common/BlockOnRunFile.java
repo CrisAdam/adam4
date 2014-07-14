@@ -47,7 +47,7 @@ public class BlockOnRunFile
                         WatchEvent.Kind<?> kind = event.kind();
                         if (kind == StandardWatchEventKinds.OVERFLOW)
                         {
-                            Common.log.LogMessage("File watcher overflow", LogLevel.INFO);
+                            Common.log.logMessage("File watcher overflow", LogLevel.INFO);
                             if (!watchedFile.exists())
                             {
                                 // do nothing
@@ -63,7 +63,7 @@ public class BlockOnRunFile
                             if (filename.toAbsolutePath().toString().equals(watchedFile.getAbsolutePath().toString()))
                             {
                                 watcher.close();
-                                Common.log.LogMessage("watchedFile file has been deleted", LogLevel.INFO);
+                                Common.log.logMessage("watchedFile file has been deleted", LogLevel.INFO);
                                 break;
                             }
                         }
@@ -72,7 +72,7 @@ public class BlockOnRunFile
                 catch (Exception e)
                 {
                     watcher.close();
-                    Common.log.LogMessage(e, LogLevel.INFO);
+                    Common.log.logMessage(e, LogLevel.INFO);
                     continue;
                 }
             }// end while loop
@@ -80,7 +80,7 @@ public class BlockOnRunFile
         catch (IOException e1)
         {
 
-            Common.log.LogMessage(e1, LogLevel.ERROR);
+            Common.log.logMessage(e1, LogLevel.ERROR);
         }
     }
 }

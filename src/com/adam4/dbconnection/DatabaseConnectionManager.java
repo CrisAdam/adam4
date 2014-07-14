@@ -113,7 +113,7 @@ public class DatabaseConnectionManager
     private boolean writeDistributedData(SQLRequest request)
     {
 
-        Common.log.LogMessage("distributed writes not yet implemented", LogLevel.ERROR);
+        Common.log.logMessage("distributed writes not yet implemented", LogLevel.ERROR);
         return false;
         /*
          * todo: finish these
@@ -150,7 +150,7 @@ public class DatabaseConnectionManager
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
             return false;
         }
     }
@@ -163,7 +163,7 @@ public class DatabaseConnectionManager
         }
         catch (SQLException e)
         {
-            Common.log.LogMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
         }
     }
 

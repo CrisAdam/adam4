@@ -24,7 +24,7 @@ public class MyLogger
         catch (UnknownHostException e)
         {
             this.server = "UnknownServer";
-            LogMessage(e, LogLevel.ERROR);
+            logMessage(e, LogLevel.ERROR);
         }
         this.application = "unset";
         sorter = new Sorter();
@@ -44,7 +44,7 @@ public class MyLogger
     {
         try
         {
-            LogMessage("Logger was not cleanly closed", LogLevel.ERROR);
+            logMessage("Logger was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally
@@ -63,7 +63,7 @@ public class MyLogger
         DEBUG, INFO, WARN, ERROR, OFF;
     }
 
-    public void LogMessage(Exception e, LogLevel level)
+    public void logMessage(Exception e, LogLevel level)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(e.getClass().toString());
@@ -74,10 +74,10 @@ public class MyLogger
             sb.append(" -> ");
             sb.append(element.toString());
         }
-        LogMessage(sb.toString(), level);
+        logMessage(sb.toString(), level);
     }
 
-    public void LogMessage(String message, LogLevel level)
+    public void logMessage(String message, LogLevel level)
     {
         sorter.addError(new Error(server, application, Thread.currentThread().getName(), message, level, Common.getTime()));
     }

@@ -85,7 +85,7 @@ public class DatabaseConnectionPool
     {
         try
         {
-            Common.log.LogMessage("ConnectionPool was not cleanly closed", LogLevel.ERROR);
+            Common.log.logMessage("ConnectionPool was not cleanly closed", LogLevel.ERROR);
             close();
         }
         finally

@@ -19,12 +19,17 @@ public class GenericIRCMessage implements iIRCMessage
         {
             return s.replaceAll("(\\r|\\n)", "") + ' ';
         }
-        return (':' + s.replaceAll("(\\r|\\n)", "") + ' ');
+        return (" :" + s.replaceAll("(\\r|\\n)", "") + ' ');
     }
 
     public GenericIRCMessage(String message) throws UnknownHostException
     {
         this.msg = getPrefix() + validate(message);
+    }
+
+    public GenericIRCMessage(String message, int number) throws UnknownHostException
+    {
+        this.msg = getPrefix() + number + validate(message);
     }
 
     public String toString()
