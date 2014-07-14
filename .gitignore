@@ -14,3 +14,9 @@ run
 build.xml
 .classpath
 manifest.mf
+server*
+security/
+security*
+*.pem
+*.pub
+*.ppk

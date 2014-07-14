@@ -1,19 +1,20 @@
 package com.adam4.spacenet;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.adam4.SFA.PlayerData;
 import com.adam4.common.Common;
-import com.adam4.dbconnection.SQLRequest;
 import com.adam4.irc.GenericIRCMessage;
 import com.adam4.irc.IRC;
 import com.adam4.irc.IRCError;
@@ -64,7 +65,7 @@ public class ClientHandler implements Runnable
             }
             catch (IOException e)
             {
-                message = "error";
+                message = "error";  // not sure if needed
                 try
                 {
                     s.close();
@@ -202,12 +203,32 @@ public class ClientHandler implements Runnable
     private void away(ParsedMessage parsed)
     {
         away = !away;
-        // TODO Auto-generated method stub
+        // TODO notify all who are talking directly with this person
 
     }
 
     private void help(ParsedMessage parsed)
     {
+        BufferedReader br;
+        try
+        {
+            br = new BufferedReader(new FileReader(System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "resources" + FileSystems.getDefault().getSeparator() + "spacenetHelp.txt"));
+            String line = null;
+            while ((line = br.readLine()) != null)
+            {
+                System.out.println(line);
+            }
+            br.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         sendIRCMessage("help");
     }
 
@@ -229,28 +250,31 @@ public class ClientHandler implements Runnable
         // TODO Auto-generated method stub
 
     }
-    
+
     private void join(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
     }
+
     private void kick(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
     }
+
     private void kill(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
     }
-    
+
     private void knock(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
 
     }
+
     private void list(ParsedMessage parsed)
     {
         // TODO Auto-generated method stub
@@ -262,33 +286,34 @@ public class ClientHandler implements Runnable
         // TODO Auto-generated method stub
 
     }
-    
+
     private void user(ParsedMessage parsed)
     {
         // connect
-        userName = parsed.trailing.replace(":",  "");
-        String login = "SELECT ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE FROM AUTH.CLIENT WHERE CLIENTNAME=\""+userName+"\";";
+        userName = parsed.trailing.replace(":", "");
+        String login = "SELECT ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE FROM AUTH.CLIENT WHERE CLIENTNAME=\"" + userName + "\";";
         ResultSet result = SpaceNetServer.clientDatabaseManager.getData(login);
         try
         {
             if (!result.first())
             {
-                //user does not exist, insert into database
+                // user does not exist, insert into database
                 String create = "INSERT INTO AUTH.CLIENT (ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE) VALUES ( /* ACCESSLEVEL */ /* CLIENTNAME */, /* HASHEDPASSWORD */, /* LASTLOGINDATE */ );";
             }
         }
         catch (SQLException e)
         {
             Common.log.LogMessage(e, LogLevel.ERROR);
-        };
-         if(parsed.args[0].startsWith("8"))
-         {
-             invisible = true;
-         }
-         else
-         {
-             invisible = false;
-         }
+        }
+        ;
+        if (parsed.args[0].startsWith("8"))
+        {
+            invisible = true;
+        }
+        else
+        {
+            invisible = false;
+        }
     }
 
     private void userhost(ParsedMessage parsed)
@@ -308,12 +333,6 @@ public class ClientHandler implements Runnable
         // TODO Auto-generated method stub
 
     }
-
-   
-
-    
-
-   
 
     private void summon(ParsedMessage parsed)
     {
@@ -387,8 +406,6 @@ public class ClientHandler implements Runnable
 
     }
 
-
-
     private void pass(ParsedMessage parsed)
     {
         try
@@ -431,8 +448,6 @@ public class ClientHandler implements Runnable
         // TODO Auto-generated method stub
 
     }
-
-    
 
     private void nick(ParsedMessage parsed)
     {

@@ -30,7 +30,8 @@ public class Ping
             {
                 temp = output.readLine();
                 if (temp.equals("Request timed out.") || temp.equals("100% packet loss"))
-                { // windows version linux version
+                { // windows version
+                  // linux version
                     return Integer.MAX_VALUE;
                 }
                 else if (temp.contains("Minimum"))

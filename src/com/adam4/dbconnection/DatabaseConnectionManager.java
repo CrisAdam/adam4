@@ -18,8 +18,12 @@ public class DatabaseConnectionManager
     private DatabaseConnectionPool localConPool;
     private Thread pendingQueueThread;
     private Thread confirmedQueueThread;
-    private LinkedList<String> pendingQueue; // temporary holding place for requests to be saved until the majority has saved them
-    private LinkedList<String> confirmedQueue;// temporary holding place for requests that the majority has decided to commit
+    private LinkedList<String> pendingQueue; // temporary holding place for
+                                             // requests to be saved until
+                                             // the majority has saved them
+    private LinkedList<String> confirmedQueue;// temporary holding place for
+                                              // requests that the majority
+                                              // has decided to commit
 
     public DatabaseConnectionManager(DatabaseConnectionPool localDB, LinkedList<SeparatedURL> managerPoolURLs)
     {

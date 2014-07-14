@@ -27,6 +27,7 @@ public class SpaceNetServer
     static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
     static DatabaseConnectionManager serverDatabaseManager; // used to authenticate other servers
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SpaceNetServer.run";
+    private static ClientListener clientListener;
 
     public static void main(String[] args) throws Exception
     {
@@ -36,6 +37,8 @@ public class SpaceNetServer
             // do not run program if it is given invalid arguments
             return;
         }
+        
+        clientListener = new ClientListener();
 
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();

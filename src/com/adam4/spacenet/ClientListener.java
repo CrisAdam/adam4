@@ -54,18 +54,18 @@ public class ClientListener
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients)
                     {
-
+                        new Thread(new ClientHandler(clientSocket)).start();
                     }
                     else
                     {
-
+                        Common.log.LogMessage("Not accepting new connections " + clientSocket.getLocalAddress(), LogLevel.WARN);
+                        clientSocket.close();
                     }
                 }
                 catch (SocketException e)
                 {
                     ;
-                    // do nothing; this is an exit due to SoTimeout such that it can
-                    // check that if it should still be listening or not
+                    // do nothing; this is an exit due to SoTimeout such that it can check that if it should still be listening or not
                 }
                 catch (IOException e)
                 {
