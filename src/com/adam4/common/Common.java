@@ -26,6 +26,12 @@ public class Common
     public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
     public static MyLogger log = new MyLogger();
 
+    public static boolean hasMajority(int votes, int max)
+    {
+        // assume votes and max are both >= 1
+        return (((max - votes) - votes) < 0);
+    }
+
     public static Timestamp getTime()
     {
         return new Timestamp(new Date().getTime());
@@ -39,17 +45,17 @@ public class Common
         }
         return ':' + s;
     }
-    
+
     public static String removeColons(String s)
     {
         return s.replaceAll(":", "");
     }
-    
+
     public static String removeNewLine(String s)
     {
         return s.replaceAll("(\\r|\\n)", "");
     }
-    
+
     public static String getHostName()
     {
         try

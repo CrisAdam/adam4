@@ -11,13 +11,12 @@ public class ParsedMessage
 
     public ParsedMessage(String prefix, String command, String[] args, String trailing)
     {
-
         this.prefix = prefix;
         this.trailing = Common.removeNewLine(trailing);
         this.command = command;
         this.args = args;
     }
-    
+
     public ParsedMessage(String command, String[] args, String trailing)
     {
 
@@ -26,7 +25,7 @@ public class ParsedMessage
         this.command = command;
         this.args = args;
     }
-    
+
     public ParsedMessage(String command, String trailing)
     {
 
@@ -34,7 +33,7 @@ public class ParsedMessage
         this.trailing = trailing;
         this.command = command;
     }
-    
+
     public ParsedMessage(String command, String[] args)
     {
 
@@ -45,7 +44,11 @@ public class ParsedMessage
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder(Common.prefixColon(prefix));
+        StringBuilder sb = new StringBuilder();
+        if (!prefix.equals(""))
+        {
+            sb.append(Common.prefixColon(prefix));
+        }
         sb.append(' ');
         sb.append(command);
         if (args != null)
@@ -57,13 +60,12 @@ public class ParsedMessage
                 sb.append(' ');
             }
         }
-        if (trailing != null)
+        if (!trailing.equals(""))
         {
             sb.append(' ');
             sb.append(Common.prefixColon(trailing));
         }
         return sb.toString();
     }
-
 
 }

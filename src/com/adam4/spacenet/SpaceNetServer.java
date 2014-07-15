@@ -22,7 +22,7 @@ public class SpaceNetServer
     // constants
     public final static String version = "1.0";
     private static final int maxIdleClientConnections = 3;
-    public static final int ENDCHECKFREQUENCY = 100; // polling frequency in ms for network to close socket
+    public static final int ENDCHECKFREQUENCY = 5000; // polling frequency in ms for network to close socket
 
     // class variables
     private static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
@@ -84,7 +84,7 @@ public class SpaceNetServer
                 break;
             case "-cdb":
             case "-clientdatabase":
-                clientDatabaseManager =new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
+                clientDatabaseManager = new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
                 break;
             case "-r":
             case "-run":
@@ -101,12 +101,17 @@ public class SpaceNetServer
                 return false;
             }
         }
+        if (clientDatabaseManager == null)
+        {
+            System.out.println("Client database connection required");
+            return false;
+        }
         return true;
     } // end CLI processing
 
     public static void statusChange(Client client, String trailing)
     {
-        //     for ();
+        // for ();
         // TODO for each person who is friends with caller, and for each channel the caller is in, update display status
 
     }

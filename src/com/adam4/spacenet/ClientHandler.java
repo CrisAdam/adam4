@@ -26,14 +26,12 @@ public class ClientHandler implements Runnable
 {
     private Client client;
 
-
-
     private Socket s;
 
     ClientHandler(Socket s)
     {
         this.s = s;
-
+        client = new Client(this);
     }
 
     @Override
@@ -86,5 +84,4 @@ public class ClientHandler implements Runnable
         client.disconnect();
     }
 
-   
 }

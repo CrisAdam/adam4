@@ -30,12 +30,16 @@ public class ClientListener
         {
             serverSocket = new ServerSocket(6667);
             reciever = new Reciever(serverSocket);
-            new Thread(reciever).start();
+            Thread temp = new Thread(reciever);
+            temp.setName("Unsecure Client reciever thread");
+            temp.start();
 
             ServerSocketFactory sslserversocketfactory = SSLServerSocketFactory.getDefault();
             sslServerSocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(6697);
             reciever = new Reciever(serverSocket);
-            new Thread(reciever).start();
+            temp = new Thread(reciever);
+            temp.setName("Secure Client reciever thread");
+            temp.start();
         }
         catch (IOException e)
         {

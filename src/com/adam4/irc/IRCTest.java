@@ -6,6 +6,13 @@ import org.junit.Test;
 
 public class IRCTest
 {
+    @Test
+    public void testNick()
+    {
+        System.out.println(IRC.parseLine("NICK ex123"));
+
+        System.out.println(new ParsedMessage("NICK", "ex123"));
+    }
 
     @Test
     public void testParseLine()
@@ -35,7 +42,7 @@ public class IRCTest
 
         for (String s : test)
         {
-            System.out.println(IRC.parseLine(s));
+            // System.out.println(IRC.parseLine(s));
         }
     }
 

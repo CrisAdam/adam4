@@ -14,6 +14,47 @@ public class UnitTests
 {
 
     @Test
+    public void testMajority()
+    {
+        if (!Common.hasMajority(1, 1))
+        {
+            fail("1 1");
+        }
+        if (Common.hasMajority(1, 2))
+        {
+            fail("1 2");
+        }
+        if (!Common.hasMajority(2, 2))
+        {
+            fail("1 2");
+        }
+        if (!Common.hasMajority(2, 3))
+        {
+            fail("2 3");
+        }
+        if (Common.hasMajority(1, 3))
+        {
+            fail("1 3");
+        }
+        if (!Common.hasMajority(2, 3))
+        {
+            fail("2 3");
+        }
+        if (Common.hasMajority(2, 4))
+        {
+            fail("2 4");
+        }
+        if (Common.hasMajority(2, 5))
+        {
+            fail("2 5");
+        }
+        if (!Common.hasMajority(3, 5))
+        {
+            fail("3 5");
+        }
+    }
+
+    @Test
     public void testHashPassword()
     {
         String secretHash = "";

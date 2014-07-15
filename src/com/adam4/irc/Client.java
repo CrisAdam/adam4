@@ -46,7 +46,7 @@ public class Client
     // 800: super moderator: can promote/demote moderators, see server loads, and move users/groups to different servers
     // 1000: admin: can do everything, including shutdown/reboot of servers
 
-    Client(ClientHandler handler)
+    public Client(ClientHandler handler)
     {
         timeRecieved = new LinkedList<Date>();
         sendLevel = 10000; // 10 messages in 10 seconds average
@@ -180,7 +180,7 @@ public class Client
                 timeRecieved.pop();
             }
         }
-        else if (timeRecieved.peek().getTime() - timeRecieved.getLast().getTime() < (sendLevel * 1.2))
+        else if (timeRecieved.peek().getTime() - timeRecieved.getLast().getTime() < (sendLevel * 1.2) && timeRecieved.size() >= 10)
         {
             try
             {
@@ -192,7 +192,7 @@ public class Client
                 Common.log.logMessage(e, LogLevel.INFO);
             }
         }
-        else
+        else if (timeRecieved.size() >= 10)
         {
             sendIRCMessage(new ParsedMessage("NOTICE", "Flood warning: you may only send an average of " + (sendLevel / 10000) + " messages per second"));
         }
@@ -203,7 +203,7 @@ public class Client
         status = Status.AWAY;
         SpaceNetServer.statusChange(this, parsed.trailing);
     }
-    
+
     private void chat()
     {
         // this starts a p2p chat session, disconnected from the server
@@ -367,13 +367,12 @@ public class Client
         }
         catch (IOException e)
         {
-            Common.log.logMessage(e,  LogLevel.WARN);
+            Common.log.logMessage(e, LogLevel.WARN);
         }
         finally
         {
             privilegeLevel = 0;
         }
-        
 
     }
 
@@ -403,7 +402,9 @@ public class Client
     private void user(ParsedMessage parsed)
     {
         // connect
+        // USER chatzilla * * :New Now Know How
         userName = parsed.trailing;
+        Thread.currentThread().setName("Client " + userName + " thread");
         String login = "SELECT ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE FROM AUTH.CLIENT WHERE CLIENTNAME=\"" + userName + "\";";
         ResultSet result = SpaceNetServer.getClientDatabaseManager().getData(login);
         try
@@ -478,7 +479,7 @@ public class Client
     private void watch(ParsedMessage parsed)
     {
         // freind request
-        
+
         // TODO Auto-generated method stub
         sendIRCMessage(new ParsedMessage("NOTICE", "This is a wishlist item that has not yet been implemented"));
     }
