@@ -31,6 +31,25 @@ public class Common
         return new Timestamp(new Date().getTime());
     }
 
+    public static String prefixColon(String s)
+    {
+        if (s.startsWith(":"))
+        {
+            return s;
+        }
+        return ':' + s;
+    }
+    
+    public static String removeColons(String s)
+    {
+        return s.replaceAll(":", "");
+    }
+    
+    public static String removeNewLine(String s)
+    {
+        return s.replaceAll("(\\r|\\n)", "");
+    }
+    
     public static String getHostName()
     {
         try

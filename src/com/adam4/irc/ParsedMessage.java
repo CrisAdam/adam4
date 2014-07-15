@@ -1,5 +1,7 @@
 package com.adam4.irc;
 
+import com.adam4.common.Common;
+
 public class ParsedMessage
 {
     public String prefix;
@@ -9,19 +11,59 @@ public class ParsedMessage
 
     public ParsedMessage(String prefix, String command, String[] args, String trailing)
     {
+
         this.prefix = prefix;
+        this.trailing = Common.removeNewLine(trailing);
+        this.command = command;
+        this.args = args;
+    }
+    
+    public ParsedMessage(String command, String[] args, String trailing)
+    {
+
+        this.prefix = Common.getHostName();
+        this.trailing = Common.removeNewLine(trailing);
+        this.command = command;
+        this.args = args;
+    }
+    
+    public ParsedMessage(String command, String trailing)
+    {
+
+        this.prefix = Common.getHostName();
         this.trailing = trailing;
+        this.command = command;
+    }
+    
+    public ParsedMessage(String command, String[] args)
+    {
+
+        this.prefix = Common.getHostName();
         this.command = command;
         this.args = args;
     }
 
     public String toString()
     {
-        String argString = "";
-        for (String s : args)
+        StringBuilder sb = new StringBuilder(Common.prefixColon(prefix));
+        sb.append(' ');
+        sb.append(command);
+        if (args != null)
         {
-            argString += s + "   ";
+            sb.append(' ');
+            for (String s : args)
+            {
+                sb.append(s);
+                sb.append(' ');
+            }
         }
-        return "Prefix: " + prefix + " command: " + command + " args: " + argString + " trailing: " + trailing;
+        if (trailing != null)
+        {
+            sb.append(' ');
+            sb.append(Common.prefixColon(trailing));
+        }
+        return sb.toString();
     }
+
+
 }

@@ -40,6 +40,11 @@ public class DatabaseConnectionManager
         }
 
     }
+    
+    public ResultSet executeSQL(String sql)
+    {
+        return null;
+    }
 
     private Runnable pendingQueueThread()
     {

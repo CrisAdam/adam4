@@ -11,6 +11,8 @@ import com.adam4.common.SeparatedURL;
 import com.adam4.dbconnection.DatabaseConnectionInfo;
 import com.adam4.dbconnection.DatabaseConnectionManager;
 import com.adam4.dbconnection.DatabaseConnectionPool;
+import com.adam4.irc.Channel;
+import com.adam4.irc.Client;
 import com.adam4.mylogger.ConsoleLogWriter;
 import com.adam4.mylogger.DatabaseLogWriter;
 import com.adam4.mylogger.FileLogWriter;
@@ -23,7 +25,7 @@ public class SpaceNetServer
     public static final int ENDCHECKFREQUENCY = 100; // polling frequency in ms for network to close socket
 
     // class variables
-    static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
+    private static DatabaseConnectionManager clientDatabaseManager; // used for player name/password lookups
 
     // private variables
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SpaceNetServer.run";
@@ -33,6 +35,7 @@ public class SpaceNetServer
     private static ConcurrentLinkedQueue<ServerHandler> connectedServers;
     private static boolean isMaster = false;
     private static boolean isConnectedToMajority = false;
+    private static ConcurrentLinkedQueue<Channel> channels;
 
     public static void main(String[] args) throws Exception
     {
@@ -81,7 +84,7 @@ public class SpaceNetServer
                 break;
             case "-cdb":
             case "-clientdatabase":
-                clientDatabaseManager = new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
+                clientDatabaseManager =new DatabaseConnectionManager(new DatabaseConnectionPool(new DatabaseConnectionInfo(args[++i]), maxIdleClientConnections), new LinkedList<SeparatedURL>());
                 break;
             case "-r":
             case "-run":
@@ -101,13 +104,14 @@ public class SpaceNetServer
         return true;
     } // end CLI processing
 
-    public static void away(ClientHandler clientHandler, boolean away)
+    public static void statusChange(Client client, String trailing)
     {
-        // TODO for each person who is friends with caller, update display status
+        //     for ();
+        // TODO for each person who is friends with caller, and for each channel the caller is in, update display status
 
     }
 
-    public static void disconnect(ClientHandler clientHandler)
+    public static void disconnect(Client client)
     {
         // TODO Auto-generated method stub
 
@@ -117,6 +121,11 @@ public class SpaceNetServer
     {
         // TODO for each operator, send then the message
 
+    }
+
+    public static DatabaseConnectionManager getClientDatabaseManager()
+    {
+        return clientDatabaseManager;
     }
 
 }
