@@ -1,4 +1,4 @@
-package com.adam4.SFA;
+package com.adam4.common;
 
 public class Point
 {

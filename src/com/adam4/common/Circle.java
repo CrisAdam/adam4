@@ -1,6 +1,5 @@
 package com.adam4.common;
 
-import com.adam4.SFA.Point;
 
 public class Circle
 {

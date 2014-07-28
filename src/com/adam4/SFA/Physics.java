@@ -1,5 +1,7 @@
 package com.adam4.SFA;
 
+import com.adam4.common.Point;
+
 public class Physics implements Runnable
 {
     Game game;
