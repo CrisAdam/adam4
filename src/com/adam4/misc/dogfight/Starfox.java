@@ -1,196 +1,140 @@
 package com.adam4.misc.dogfight;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Predicate;
+
+import Planes.*;
 
 public class Starfox extends PlaneControl
 {
+    boolean isAhead;
+    private ArrayList<Point3D> corners;
+    
 
     public Starfox(int arenaSize, int rounds)
     {
         super(arenaSize, rounds);
+        isAhead = false;
+        // add corners as places to be avoided
+        corners.add(new Point3D(0, 0, 0));
+        corners.add(new Point3D(0, 0, arenaSize - 1));
+        corners.add(new Point3D(0, arenaSize - 1, 0));
+        corners.add(new Point3D(0, arenaSize - 1, arenaSize - 1));
+        corners.add(new Point3D(arenaSize - 1, 0, 0));
+        corners.add(new Point3D(arenaSize - 1, 0, arenaSize - 1));
+        corners.add(new Point3D(arenaSize - 1, arenaSize - 1, 0));
+        corners.add(new Point3D(arenaSize - 1, arenaSize - 1, arenaSize - 1));
+        
     }
 
-    private ArrayList<Point3D> dangerousPositions;
-    private ArrayList<Point3D> riskyPositions;
+
+    class bestMoves
+    {
+        bestMoves()
+        {
+            score = -10000;
+        }
+        int score;
+        Move[] moves;
+    }
 
     @Override
     public Move[] act()
     {
-        dangerousPositions = new ArrayList<>();
-        riskyPositions = new ArrayList<>();
-
-        // add corners as places to be avoided
-        dangerousPositions.add(new Point3D(0, 0, 0));
-        dangerousPositions.add(new Point3D(0, 0, arenaSize - 1));
-        dangerousPositions.add(new Point3D(0, arenaSize - 1, 0));
-        dangerousPositions.add(new Point3D(0, arenaSize - 1, arenaSize - 1));
-        dangerousPositions.add(new Point3D(arenaSize - 1, 0, 0));
-        dangerousPositions.add(new Point3D(arenaSize - 1, 0, arenaSize - 1));
-        dangerousPositions.add(new Point3D(arenaSize - 1, arenaSize - 1, 0));
-        dangerousPositions.add(new Point3D(arenaSize - 1, arenaSize - 1, arenaSize - 1));
-
-        System.out.println("enemy planes: " + super.enemyPlanes.length);
+        ArrayList<Point3D> riskyPositions = new ArrayList<>();
+        ArrayList<Point3D> dangerousPositions = new ArrayList<>(corners);
+        
+        // add enemy potential moves and firing area to risky positions
         for (Plane p : super.enemyPlanes)
         {
-            if (p.getPossibleDirections().length > 0)
+            for (Direction d : p.getPossibleDirections())
             {
-                for (Direction d : p.getPossibleDirections())
-                {
-                    Point3D potentialPosition = new Point3D(p.getX(), p.getY(), p.getZ()).add(d.getAsPoint3D());
-                    if (potentialPosition.isInArena(arenaSize))
-                    {
-                        riskyPositions.add(potentialPosition);
-                        if (p.canShoot())
-                        {
-                            for (Point3D range : p.getShootRange())
-                            {
-                                riskyPositions.add(range.add(potentialPosition));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        ArrayList<Move> moves = new ArrayList<>();
-
-        for (Plane p : myPlanes)
-        {
-            if (p.isAlive())
-            {
-                ArrayList<Direction> potentialDirections = new ArrayList<>();
-
-                for (Direction d : p.getPossibleDirections())
-                {
-                    Point3D potentialPosition = new Point3D(p.getX(), p.getY(), p.getZ()).add(d.getAsPoint3D());
-                    if (potentialPosition.isInArena(arenaSize))
-                    {
-                        potentialDirections.add(d);
-                    }
-                }
-
-                System.out.println("potentialDirections 1: " + potentialDirections.size());
-
-                // remove dangerous positions from flight plan
-                potentialDirections.removeIf(new Predicate<Direction>()
-                {
-                    @Override
-                    public boolean test(Direction test)
-                    {
-                        boolean result = false;
-                        for (Point3D compare : dangerousPositions)
-                        {
-                            if (p.getPosition().add(test.getAsPoint3D()).equals(compare))
-                            {
-                                result = true;
-                            }
-                        }
-                        return result && potentialDirections.size() > 0;
-                    }
-                });
-                
-              System.out.println("potentialDirections 2: " + potentialDirections.size());
-
-                // remove positions with no future from flight plan
-                /*
-                 * potentialDirections.removeIf(new Predicate<Direction>() {
-                 * 
-                 * @Override public boolean test(Direction test) { boolean hasFuture = false; for (Direction compare : p.getPossibleDirections()) { Plane future = new Plane(arenaSize, 0, compare,
-                 * p.getPosition().add(compare.getAsPoint3D())); if (future.getPossibleDirections().length == 0) { continue; } for (Direction d : future.getPossibleDirections()) { if
-                 * (future.getPosition().add(d.getAsPoint3D()).isInArena(arenaSize)) { hasFuture = true; break; } } } return !hasFuture; } });
-                 */
-
-                // remove risky positions from flight plan
-              
-            
-              
-                potentialDirections.removeIf(new Predicate<Direction>()
-                {
-                    @Override
-                    public boolean test(Direction test)
-                    {
-                        boolean result = false;
-                        for (Point3D compare : riskyPositions)
-                        {
-                            if (p.getPosition().add(test.getAsPoint3D()).equals(compare))
-                            {
-                                result = true;
-                            }
-                        }
-                        return result && potentialDirections.size() > 0;
-                    }
-                });
-                
-                System.out.println("potentialDirections 3: " + potentialDirections.size());
-
-                // check for targets
-                Direction best = null;
+                riskyPositions.add(p.getPosition().add(d.getAsPoint3D()));
                 if (p.canShoot())
                 {
-                    int potentialHits = 0;
-                    for (Direction d : potentialDirections)
+                    for (Point3D range : p.simulateMove(new Move(d, true, false)).getShootRange())
                     {
-                        Plane future = new Plane(arenaSize, 0, d, p.getPosition().add(d.getAsPoint3D()));
-                        for (Point3D t : future.getShootRange())
-                        {
-                            int targets = 0;
-                            for (Plane e : super.enemyPlanes)
-                            {
-                                for (Direction s : e.getPossibleDirections())
-                                {
-                                    Plane target = new Plane(arenaSize, 0, s, e.getPosition().add(s.getAsPoint3D()));
-                                    if (target.getPosition().equals(t))
-                                    {
-                                        targets++;
-                                    }
-
-                                }
-                            }
-                            if (targets > potentialHits)
-                            {
-                                best = d;
-                                potentialHits = targets;
-                            }
-                        }
+                        riskyPositions.add(range);
+                    }
+                    for (Point3D range : p.simulateMove(new Move(d, false, false)).getShootRange())
+                    {
+                        riskyPositions.add(range);
                     }
                 }
-
-                if (potentialDirections.size() == 0)
-                {
-                    moves.add(new Move(new Direction("N"), false, false));
-                    continue;
-                }
-
-                if (best == null)
-                {
-                    best = potentialDirections.get((int) Math.floor(Math.random() * potentialDirections.size()));
-                }
-
-                moves.add(new Move(best, true, false));
-                dangerousPositions.add(p.getPosition().add(best.getAsPoint3D()));
-
-            }
-            else
-            {
-                // this plane is dead, not much to do but go hide in corner
-                moves.add(new Move(new Direction("N"), false, false));
-
             }
         }
+        
+        return getBestMove(new ArrayList<Plane>(Arrays.asList(super.myPlanes)), dangerousPositions, riskyPositions).moves;
 
-        return moves.toArray(new Move[moves.size()]);
+    }
+
+    private bestMoves getBestMove(ArrayList<Plane> planes, ArrayList<Point3D> dangerousPositions, ArrayList<Point3D> riskyPositions)
+    {
+        
+        // return n moves where n is number of planes passed in
+        bestMoves bestMove = new bestMoves();
+        bestMove.moves = new Move[planes.size()];
+        ArrayList<Point3D> currentDangerousPositions = new ArrayList<Point3D>(dangerousPositions);
+        
+        for (int i = 0; i < planes.size(); i++)
+        {
+            ArrayList<Plane> others = new ArrayList<Plane>(planes);
+            others.remove(i);
+            
+            
+            
+            bestMoves bestPlaneMove = new bestMoves();
+            // calculate score for plane
+            for (Direction d : p.getPossibleDirections())
+            {
+                bestMoves bestDirectionMove = new bestMoves();
+                
+                ArrayList<Move> moves = new ArrayList<>();
+                moves.add(new Move(d, true, false));
+                moves.add(new Move(d, false, false));
+                if (p.canShoot())
+                {
+                    moves.add(new Move(d, true, true));
+                    moves.add(new Move(d, true, true));
+                }
+                
+                for (Move m : moves)
+                {
+                    int score = getScore(p,m, dangerousPositions, riskyPositions);
+                    if (score > bestDirectionMove.score)
+                    {
+                        bestDirectionMove.score = score;
+                        bestDirectionMove.moves = new Move[1];
+                        bestDirectionMove.moves[0] = m;
+                    }
+                }
+                
+                if (bestDirectionMove.score > bestPlaneMove.score)
+                {
+                    bestPlaneMove.moves = bestDirectionMove.moves;
+                }
+            }
+            //
+        }
+        return bestMove;
+    }
+
+    private int getScore(Plane p, Move move, ArrayList<Point3D> dangerousPositions, ArrayList<Point3D> riskyPositions)
+    {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
     public void newFight(int fightsFought, int myScore, int enemyScore)
     {
-        // Using information is for schmucks.
+        isAhead = (myScore > enemyScore);
     }
 
     @Override
     public void newOpponent(int fights)
     {
-        // What did I just say about information?
+        // how many times you will fight
     }
 }
