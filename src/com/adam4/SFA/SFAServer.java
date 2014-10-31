@@ -50,10 +50,12 @@ public class SFAServer
 
     public static void main(String[] args) throws Exception
     {
+    	System.out.println("running");
         Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
         if (!handleCLI(args))
         {
             // do not run program if it is given invalid arguments
+        	
             return;
         }
 

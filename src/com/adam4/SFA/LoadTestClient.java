@@ -76,6 +76,8 @@ public class LoadTestClient
 
             output.write((connect.getBytes("UTF-8")));
             BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder()));
+            
+            s.close();
 
         }
         catch (IOException e)
@@ -85,6 +87,7 @@ public class LoadTestClient
         }
 
         // startThreads(1);
+        
 
     }
 

@@ -12,21 +12,21 @@ public class Channel
 
     public Channel(String name, Collection<Client> clients)
     {
-        this.clients = new ConcurrentLinkedQueue();
+        this.clients = new ConcurrentLinkedQueue<Client>();
         this.clients.addAll(clients);
         channelName = name;
     }
 
     public Channel(String name, Client client)
     {
-        this.clients = new ConcurrentLinkedQueue();
+        this.clients = new ConcurrentLinkedQueue<Client>();
         this.clients.add(client);
         channelName = name;
     }
 
     public Channel(String name)
     {
-        this.clients = new ConcurrentLinkedQueue();
+        this.clients = new ConcurrentLinkedQueue<Client>();
         channelName = name;
     }
 

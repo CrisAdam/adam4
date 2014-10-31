@@ -1,7 +1,6 @@
 package com.adam4.SFA;
 
 import com.adam4.common.Circle;
-import com.adam4.common.Common.*;
 
 public interface iCollider
 {

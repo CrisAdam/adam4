@@ -11,7 +11,7 @@ import com.adam4.mylogger.MyLogger;
 
 class InputCommands
 {
-    Point screenCenter;
+    Point screenCenter; // view center
     Point targetLocation; // mouse position
     char[] changedKeys;
 }
