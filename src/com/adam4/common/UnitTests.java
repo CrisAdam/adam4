@@ -65,6 +65,7 @@ public class UnitTests
         {
             fail("bad hash");
         }
+        // should add salt
     }
 
     @Test
