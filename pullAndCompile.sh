@@ -1,8 +1,8 @@
 
-activeDir=/SFA/StarFleetAssaultServer/Server
-gitDir=/staging/SFA/StarFleetAssaultServer
+activeDir=/home/ec2-user/adam4/run
+gitDir=/home/ec2-user/adam4
 package=com/adam4/SFA
-config=`cat /SFA/config/ServerConfig.txt`
+config=`cat /home/ec2-user`
 
 
 
@@ -17,4 +17,4 @@ cp $gitDir/Server/lib/* $activeDir/lib/
 #cp $activeDir/lib/* $gitDir/Server/lib/
 
 
-java -cp $activeDir/lib/*:$activeDir/bin/ $package.TestMyLogger $config
+/opt/jdk1.8.0_40/bin/java -cp $activeDir/lib/*:$activeDir/bin/ $package.TestMyLogger $config
