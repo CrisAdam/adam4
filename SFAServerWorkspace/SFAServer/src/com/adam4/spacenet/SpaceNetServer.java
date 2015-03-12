@@ -46,9 +46,6 @@ public class SpaceNetServer
             return;
         }
         connectedClients = new ConcurrentLinkedQueue();
-        clientListener = new ClientListener();
-
-        serverListener = new ServerListener();
 
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
