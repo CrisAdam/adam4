@@ -50,12 +50,11 @@ public class SFAServer
 
     public static void main(String[] args) throws Exception
     {
-    	System.out.println("running");
         Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
+        Common.log.logMessage("SFA Server starting", LogLevel.DEBUG);
         if (!handleCLI(args))
         {
             // do not run program if it is given invalid arguments
-        	
             return;
         }
 
@@ -65,7 +64,7 @@ public class SFAServer
         // by deleting it
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
-
+        Common.log.logMessage("SFA Server ending", LogLevel.DEBUG);
         endServer();
         Common.log.close();
 

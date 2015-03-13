@@ -11,6 +11,8 @@ cd $gitDir && git reset --hard origin/master
 ls $gitDir/SFAServerWorkspace/SFAServer/src/**/**/*.java
 #remove unrelated projects
 rm -r $srcDir/com/adam4/misc
+rm -r $srcDir/com/adam4/irc
+rm -r $srcDir/com/adam4/spacenet
 #remove test files that may not compile
 find $srcDir -type f -name '*test*.java' -delete 
 find $srcDir -type f -name '*Test*.java' -delete 
