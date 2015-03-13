@@ -23,6 +23,7 @@ find $srcDir -type f -name '*Test*.java' -delete
 if [ $? -eq 0 ]
 then
 	if [ -a /home/ec2-user/run/SFAServer.run ]
+	then
 	rm /home/ec2-user/run/SFAServer.run
 	sleep 60
 	pkill -9 java
