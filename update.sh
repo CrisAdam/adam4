@@ -39,4 +39,9 @@ then
 	echo $status | mail -s `hostname` cristianradam@gmail.com
 fi
 
-
+if [ -a /home/ec2-user/adam4/SFAServer.run ]
+then
+else
+nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+echo "run file missing - restarting" | mail -s `hostname` cristianradam@gmail.com
+fi
