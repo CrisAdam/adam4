@@ -27,6 +27,7 @@ then
 	then
 	echo "run file exists, deleting"
 	rm /home/ec2-user/adam4/SFAServer.run
+	echo "waiting 60 seconds for shutdown"
 	sleep 60
 	pkill -9 java
 	fi
