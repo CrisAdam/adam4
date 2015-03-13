@@ -11,8 +11,6 @@ cd $gitDir && git reset --hard origin/master
 status=`cd $gitDir && git pull`
 if [ "$status" != "Already up-to-date." ];
 then
-
-	if [ "$status" != "Already up-to-date." ];
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
 	rm -r $srcDir/com/adam4/irc
@@ -38,6 +36,7 @@ then
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
+	echo $status | mail -s `hostname` cristianradam@gmail.com
 fi
 
 
