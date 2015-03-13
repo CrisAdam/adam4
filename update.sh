@@ -23,10 +23,10 @@ find $srcDir -type f -name '*Test*.java' -delete
 if [ $? -eq 0 ]
 then
 	echo "successful compile"
-	if [ -a /home/ec2-user/run/SFAServer.run ]
+	if [ -a /home/ec2-user/adam4/SFAServer.run ]
 	then
 	echo "run file exists, deleting"
-	rm /home/ec2-user/run/SFAServer.run
+	rm /home/ec2-user/adam4/SFAServer.run
 	sleep 60
 	pkill -9 java
 	fi
