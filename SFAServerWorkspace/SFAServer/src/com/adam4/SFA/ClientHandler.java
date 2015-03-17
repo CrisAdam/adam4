@@ -8,20 +8,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import com.adam4.common.Common;
+import com.adam4.irc.IRC;
+import com.adam4.irc.ParsedMessage;
 import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class ClientHandler implements Runnable
 {
 	Socket clientSocket;
-	Client c;
 	boolean loggedIn = false;
 	boolean inGame = false;
+	Client client;
 
-	ClientHandler(Socket connection, Client client)
+	ClientHandler(Socket connection)
 	{
 		clientSocket = connection;
-		c = client;
+		client = new Client(this);
+		
 	}
 
 	public void run()
@@ -29,7 +32,8 @@ public class ClientHandler implements Runnable
 
 		BufferedReader input = null; // not sure if I need the buffering, but
 										// having the getLine() is nice
-		String message = "";
+		String unparsedMessage ="";
+		ParsedMessage message = new ParsedMessage("Error", "unsupported message recieved");
 
 		try
 		{
@@ -45,15 +49,18 @@ public class ClientHandler implements Runnable
 		{
 			try
 			{
-				message = input.readLine();
-				if (message.isEmpty())
+				unparsedMessage = input.readLine();
+				if (unparsedMessage.isEmpty())
 				{
 					continue;
+				}
+				else
+				{
+					message = IRC.parseLine(unparsedMessage);
 				}
 			}
 			catch (IOException e)
 			{
-				message = "error";
 				try
 				{
 					clientSocket.close();
@@ -65,20 +72,21 @@ public class ClientHandler implements Runnable
 				Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 			}
 
-			char switchChar = message.charAt(0);
-			switch (switchChar)
+			String switchStr = message.command;
+			
+			switch (switchStr)	// requires java 7 to switch on string
 			{
-				case 'c': // connect
+				case "user": // connect
 				{
 					connect(message);
 					break;
 				}
-				case 'd': // disconnect
+				case "d": // disconnect
 				{
-					disconnect();
+					disconnect("");
 					break;
 				}
-				case 'e': // enter game
+				case "e": // enter game
 				{
 					if (loggedIn)
 					{
@@ -86,7 +94,7 @@ public class ClientHandler implements Runnable
 					}
 					break;
 				}
-				case 'i': // game input
+				case "i": // game input
 				{
 					if (loggedIn && inGame)
 					{
@@ -94,18 +102,23 @@ public class ClientHandler implements Runnable
 					}
 					break;
 				}
-				case 'j': // join (new account)
+				case "j": // join (new account)
 				{
 					join(message);
 					break;
 				}
-				case 'g': // get available games
+				case "g": // get available games
 				{
 					getGames();
 					break;
 				}
+				case "PASS": // connect
+				{
+					setPassword(message);
+					break;
+				}
 
-				case 'r': // toggle ready status
+				case "r": // toggle ready status
 				{
 					if (loggedIn && inGame)
 					{
@@ -114,7 +127,7 @@ public class ClientHandler implements Runnable
 					break;
 				}
 
-				case 's': // select ship
+				case "s": // select ship
 				{
 					if (loggedIn && inGame)
 					{
@@ -122,7 +135,7 @@ public class ClientHandler implements Runnable
 					}
 					break;
 				}
-				case 'u': // update info
+				case "u": // update info
 				{
 					updateInfo(message);
 					break;
@@ -131,7 +144,7 @@ public class ClientHandler implements Runnable
 				default:
 				{
 					Common.log.logMessage(
-							"unsupported message type" + message.charAt(0),
+							"unsupported message type" + message.toString(),
 							MyLogger.LogLevel.ERROR);
 					break;
 				}
@@ -139,9 +152,15 @@ public class ClientHandler implements Runnable
 		}
 	}
 
-	private void connect(String message)
+	private void setPassword(ParsedMessage message) 
 	{
-		String[] params = message.split(Common.SEPARATOR);
+		client.password = message.args[0];
+	}
+
+	private void connect(ParsedMessage message)
+	{
+		//TODO: fix the [params
+		String[] params = message.command.split(Common.SEPARATOR);
 		// 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
 		String playerName = params[1];
 		String password = params[2] + playerName;
@@ -157,10 +176,11 @@ public class ClientHandler implements Runnable
 	//	if ()
 	}
 
-	public void disconnect()
+	public void disconnect(String reason)
 	{
 		loggedIn = false;
 		inGame = false;
+		Network.sendError(clientSocket, reason);
 		try
 		{
 			clientSocket.close();
@@ -171,7 +191,7 @@ public class ClientHandler implements Runnable
 		}
 	}
 
-	private void enter(String message)
+	private void enter(ParsedMessage message)
 	{
 		// Enter game function
 
@@ -183,16 +203,16 @@ public class ClientHandler implements Runnable
 
 	}
 
-	private void join(String message)
+	private void join(ParsedMessage message)
 	{
-		String[] params = message.split(Common.SEPARATOR);
+		String[] params = message.command.split(Common.SEPARATOR);
 		// 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
 		String playerName = params[1];
 		String password = params[2] + playerName;
 		String version = params[4];
 		if (!Common.isGoodUserName(playerName))
 		{
-			System.out.println(message);
+			System.out.println(message.args);
 			System.out.println(params[0] + "  " + params[1] + "  " + params[3]);
 			Network.sendError(clientSocket, "bad user name: " + playerName);
 			Common.log
@@ -201,25 +221,25 @@ public class ClientHandler implements Runnable
 		}
 	}
 
-	private void ready(String message)
+	private void ready(ParsedMessage message)
 	{
 		// toggle ready status (must be in game)
 
 	}
 
-	private void recieveInput(String message)
+	private void recieveInput(ParsedMessage message)
 	{
 		// must be in game
 
 	}
 
-	private void selectShip(String message)
+	private void selectShip(ParsedMessage message)
 	{
 		// must be in game
 
 	}
 
-	private void updateInfo(String message)
+	private void updateInfo(ParsedMessage message)
 	{
 		// update password or e-mail
 

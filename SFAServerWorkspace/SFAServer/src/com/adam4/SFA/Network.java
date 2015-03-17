@@ -66,18 +66,18 @@ public class Network
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients)
                     {
-
+                    	new ClientHandler(clientSocket);
                     }
                     else
                     {
-
+                    	clientSocket.close();
                     }
                 }
                 catch (SocketException e)
                 {
                     ;
                     // do nothing; this is an exit due to SoTimeout such that it
-                    // can check that if it should still be listening or not
+                    // can check if it should still be listening or not
                 }
                 catch (IOException e)
                 {

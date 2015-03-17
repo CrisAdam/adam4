@@ -1,61 +1,38 @@
 package com.adam4.SFA;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.adam4.common.Common;
 import com.adam4.common.Point;
-import com.adam4.mylogger.MyLogger.LogLevel;
-import com.adam4.mylogger.MyLogger;
 
-class InputCommands
-{
-    Point screenCenter; // view center
-    Point targetLocation; // mouse position
-    char[] changedKeys;
-}
+/*
+ * This class is intended to hold all the client data such as username, password, etc. 
+ */
 
 public class Client
 {
-    private PlayerData stats;
     private ClientHandler clientHandler;
-    private ClientDataManager clientDataManager;
-    Socket connection;
+    public String password, nick, user;
 
     ConcurrentLinkedQueue<InputCommands> inputCommands;
 
-    Client(Socket connection)
+    Client(ClientHandler handler)
     {
-        clientHandler = new ClientHandler(connection, this);
+    	clientHandler = handler;
     }
 
-    boolean logIn(String name, String hashedPassword)
+    boolean logIn()
     {
-        if (clientDataManager == null)
-        {
-            clientDataManager = new ClientDataManager(name);
-        }
-        stats = clientDataManager.getPlayerData(name);
-        if (stats.hashedPassword.length() < 20)
-        {
-            stats.hashedPassword = hashedPassword;
-            clientDataManager.setPlayerData(stats);
-        }
-        return (hashedPassword.equals(stats.hashedPassword));
+    	// TODO: add security
+    	if (password != null && nick != null && user != null)
+    	{
+    		return false;
+    	}
+        return true;
     }
 
     void disconnect(String reason)
     {
-        try
-        {
-            Network.sendError(connection, reason);
-            connection.close();
-        }
-        catch (IOException e)
-        {
-            Common.log.logMessage(e, LogLevel.WARN);
-        }
+    	clientHandler.disconnect(reason);
     }
 
     public Player getPlayer()
@@ -65,3 +42,10 @@ public class Client
     }
 
 } // end Player
+
+class InputCommands
+{
+    Point screenCenter; // view center
+    Point targetLocation; // mouse position
+    char[] changedKeys;
+}

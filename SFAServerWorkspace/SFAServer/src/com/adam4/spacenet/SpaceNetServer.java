@@ -30,9 +30,9 @@ public class SpaceNetServer
     // private variables
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SpaceNetServer.run";
     private static ClientListener clientListener;
-    private static ServerListener serverListener;
+  //  private static ServerListener serverListener;
     private static ConcurrentLinkedQueue<ClientHandler> connectedClients;
-    private static ConcurrentLinkedQueue<ServerHandler> connectedServers;
+ //   private static ConcurrentLinkedQueue<ServerHandler> connectedServers;
     private static boolean isMaster = false;
     private static boolean isConnectedToMajority = false;
     private static ConcurrentLinkedQueue<Channel> channels;

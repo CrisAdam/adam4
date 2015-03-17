@@ -5,22 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.nio.file.StandardWatchEventKinds;
-
 import com.adam4.common.BlockOnRunFile;
 import com.adam4.common.Common;
-import com.adam4.dbconnection.DatabaseConnectionManager;
 import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.mylogger.ConsoleLogWriter;
-import com.adam4.mylogger.DatabaseLogWriter;
 import com.adam4.mylogger.FileLogWriter;
-import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class SFAServer
@@ -39,19 +29,16 @@ public class SFAServer
     static DatabaseConnectionPool clientDatabasePool;
 
     // private variables
-    private static File run;
     private static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
     private static ConcurrentLinkedQueue<Client> clients = new ConcurrentLinkedQueue<Client>();
     private static Network network = new Network();
-    private static final int maxIdleClientConnections = 3;
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
-    private static boolean running = true;
-    private static ConcurrentLinkedQueue<iClientDataResource> clientDataResources = new ConcurrentLinkedQueue<>();
 
     public static void main(String[] args) throws Exception
     {
         Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
         Common.log.logMessage("SFA Server starting", LogLevel.DEBUG);
+        
         if (!handleCLI(args))
         {
             // do not run program if it is given invalid arguments
@@ -64,6 +51,7 @@ public class SFAServer
         // by deleting it
         BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
+        
         Common.log.logMessage("SFA Server ending", LogLevel.DEBUG);
         endServer();
         Common.log.close();
@@ -163,7 +151,7 @@ public class SFAServer
         clients.add(client);
     }
 
-    static void removeClient(Client client)
+    static void removePlayer(Client client)
     {
         clients.remove(client);
     }
@@ -179,17 +167,6 @@ public class SFAServer
         {
             c.disconnect("Server is going down");
         }
-    }
-
-    public static ConcurrentLinkedQueue<iClientDataResource> getClientDataResources()
-    {
-        return clientDataResources;
-    }
-
-    public static void addClient(Client c)
-    {
-        // TODO Auto-generated method stub
-
     }
 
 }

@@ -39,7 +39,7 @@ public class Game
     {
         for (Client c : clients)
         {
-            SFAServer.addClient(c);
+            SFAServer.addPlayer(c);
         }
     }
 
