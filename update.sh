@@ -10,7 +10,7 @@ cd $gitDir && git fetch origin
 cd $gitDir && git reset --hard origin/master
 status=`cd $gitDir && git pull`
 newstate=`cd $gitDir && cat gitstate.txt`
-if [ $oldstate != $newstate ];
+if [ "$oldstate" != "$newstate" ];
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
