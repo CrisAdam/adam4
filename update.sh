@@ -4,12 +4,12 @@ gitDir=/home/ec2-user/adam4
 config=`cat /home/ec2-user/config.txt`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 
-
-cd $gitDir && git reset --hard HEAD
+oldstate=`cd $gitDir && cat gitstate.txt`
+cd $gitDir && git reset --hard HEAD >> gitstate.txt
 cd $gitDir && git fetch origin
 cd $gitDir && git reset --hard origin/master
 status=`cd $gitDir && git pull`
-if [ "$status" != "Already up-to-date." ];
+if [ "$oldstate" != `cd $gitDir && cat gitstate.txt` ];
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
