@@ -14,7 +14,7 @@ if [ "$oldstate" != "$newstate" ];
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
-	rm -r $srcDir/com/adam4/irc
+#	rm -r $srcDir/com/adam4/irc
 	rm -r $srcDir/com/adam4/spacenet
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
