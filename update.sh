@@ -18,9 +18,9 @@ newstate=`cd $gitDir && cat gitstate.txt`
 if [ "$oldstate" != "$newstate" ];
 then
 	#remove unrelated projects
-	rm -r $srcDir/com/adam4/misc
+#	rm -r $srcDir/com/adam4/misc
 #	rm -r $srcDir/com/adam4/irc
-	rm -r $srcDir/com/adam4/spacenet
+#	rm -r $srcDir/com/adam4/spacenet
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
@@ -36,8 +36,8 @@ then
 		then
 		echo "run file exists, deleting"
 		rm /home/ec2-user/adam4/SFAServer.run
-		echo "waiting 30 seconds for shutdown"
-		sleep 30
+		echo "waiting 5 seconds for shutdown"
+		sleep 5
 		pkill -9 java
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
