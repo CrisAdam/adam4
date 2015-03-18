@@ -4,8 +4,13 @@ gitDir=/home/ec2-user/adam4
 config=`cat /home/ec2-user/config.txt`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 
+if [ -a $gitDir/gitstate.txt ]
+then
+	echo "no previous state" > $gitDir/gitstate.txt
+fi
+
 oldstate=`cd $gitDir && cat gitstate.txt`
-cd $gitDir && git reset --hard HEAD >> gitstate.txt
+cd $gitDir && git reset --hard HEAD > gitstate.txt
 cd $gitDir && git fetch origin
 cd $gitDir && git reset --hard origin/master
 status=`cd $gitDir && git pull`
@@ -47,3 +52,6 @@ else
 nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 echo "run file missing - restarting" | mail -s `hostname` cristianradam@gmail.com
 fi
+
+
+
