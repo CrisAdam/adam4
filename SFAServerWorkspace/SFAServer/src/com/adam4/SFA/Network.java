@@ -112,7 +112,7 @@ public class Network
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients)
                     {
-                        new Client(clientSocket);
+                        new ClientHandler(clientSocket);
                     }
                     else
                     {
