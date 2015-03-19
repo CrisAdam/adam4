@@ -41,9 +41,11 @@ then
 				if [ $check -eq 0 ]
 				then
 					sleepTimer=40
+				else
+					echo "waiting up to $sleepTimer /30 seconds for shutdown"
 				fi
 				let sleepTimer=sleepTimer+1
-				echo "waiting up to $sleepTimer /30 seconds for shutdown"
+				
 			done
 			if [ $sleepTimer -eq 30 ]
 			then
