@@ -15,7 +15,7 @@ cd $gitDir && git pull
 
 newstate=`git log -1 | grep "commit"`
 
-if [ "$oldstate" != "$newstate" ];
+if [ "$oldstate" != "$newstate" ]
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
