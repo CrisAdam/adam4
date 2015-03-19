@@ -32,23 +32,50 @@ then
 		then
 			echo "run file exists, deleting"
 			rm /home/ec2-user/adam4/SFAServer.run
-			echo "waiting 5 seconds for shutdown"
-			sleep 5
-			killed=`pgrep java`
+			sleepTimer=0
+			while [  $sleepTimer -lt 30 ]; do
+				sleep 1
+				check=`pgrep java | wc -w`
+				if [ $check -eq 0 ]
+				then
+					sleepTimer=40
+				fi
+				let sleepTimer=sleepTimer+1
+				echo "waiting up to $sleepTimer /30 seconds for shutdown"
+			done
+			if [ $sleepTimer -eq 30 ]
+			then
 			pkill -9 java
+			fi
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
-	echo "updated to $newstate from $oldstate on `date`, had to kill $killed"| mail -s `hostname` cristianradam@gmail.com
+	echo "updated to $newstate from $oldstate on `date` $killed"| mail -s `hostname` cristianradam@gmail.com
 fi
+
+sleep 5
 
 #check for successful running instance, else restart
 if [ -a /home/ec2-user/adam4/SFAServer.run ]
 then
 	echo "run file found"
 else
-	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
-	echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
+	startTimer=0
+			while [  $startTimer -lt 30 ]; do
+				sleep 1
+				if [ -a /home/ec2-user/adam4/SFAServer.run ]
+				then
+					startTimer=40
+				fi
+				let startTimer=startTimer+1
+				echo "waiting up to $startTimer /30 seconds for startup"
+			done
+			if [ $startTimer -eq 30 ]
+			then
+				nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+				echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
+			fi
+	
 fi
 
 
