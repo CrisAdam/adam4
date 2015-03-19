@@ -49,14 +49,14 @@ then
 			done
 			if [ $sleepTimer -eq 30 ]
 			then
-			killed=`pgrep java`
-			killed=`echo "had to force kill $killed"`
+			killed=`pgrep java | tr '\n' ' '`
+			killed=`echo -n "had to force kill $killed"`
 			pkill -9 java
 			fi
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
-	echo "updated to $newstate from $oldstate on `date` $killed"| mail -s `hostname` cristianradam@gmail.com
+	echo "updated to $newstate from $oldstate on `date` $killed" | mail -s `hostname` cristianradam@gmail.com
 fi
 
 sleep 5
