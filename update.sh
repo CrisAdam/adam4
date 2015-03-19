@@ -57,7 +57,7 @@ then
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
-	echo "updated to `cat gitstate.txt`
+	echo -e "updated to `cat gitstate.txt`
 	  $newstate to 
 	  $oldstate
 	   on `date` $killed )" | mail -s `hostname` cristianradam@gmail.com
