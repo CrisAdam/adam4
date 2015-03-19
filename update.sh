@@ -40,13 +40,14 @@ then
 				check=`pgrep java | wc -w`
 				if [ $check -eq 0 ]
 				then
-					sleepTimer=40
+					let sleepTimer=sleepTimer+60
 				else
 					echo "waiting up to $sleepTimer /30 seconds for shutdown"
 				fi
 				let sleepTimer=sleepTimer+1
 				
 			done
+			let sleepTimer=sleepTimer-60
 			if [ $sleepTimer -eq 30 ]
 			then
 			killed=`pgrep java | tr '\n' ' '`
