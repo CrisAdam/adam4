@@ -57,10 +57,10 @@ then
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
-	echo "updated to `cat gitstate.txt` \n
-	  $newstate \n
-	  $oldstate \n
-	  on `date` $killed )" | mail -s `hostname` cristianradam@gmail.com
+	echo "updated to `cat gitstate.txt`
+	  $newstate
+	  $oldstate
+	   on `date` $killed )" | mail -s `hostname` cristianradam@gmail.com
 fi
 
 sleep 5
