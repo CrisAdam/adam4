@@ -63,16 +63,16 @@ then
 	echo "run file found"
 else
 	startTimer=0
-			while [  $startTimer -lt 30 ]; do
+			while [  $startTimer -lt 10 ]; do
 				sleep 1
 				if [ -a /home/ec2-user/adam4/SFAServer.run ]
 				then
 					startTimer=40
 				fi
 				let startTimer=startTimer+1
-				echo "waiting up to $startTimer /30 seconds for startup"
+				echo "waiting up to $startTimer /10 seconds for startup"
 			done
-			if [ $startTimer -eq 30 ]
+			if [ $startTimer -eq 10 ]
 			then
 				nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 				echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
