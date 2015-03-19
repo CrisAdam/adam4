@@ -1,9 +1,10 @@
 #!/bin/bash
 
 #test update4
-activeDir=/home/ec2-user/adam4/run
-gitDir=/home/ec2-user/adam4
-config=`cat /home/ec2-user/config.txt`
+
+gitDir=$HOME/adam4
+activeDir=$gitDir/run
+config=`cat $HOME/config.txt`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 
 oldstate=`git log -1 | grep "commit"`
@@ -19,8 +20,7 @@ if [ "$oldstate" != "$newstate" ]
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
-#	rm -r $srcDir/com/adam4/irc
-#	rm -r $srcDir/com/adam4/spacenet
+
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
@@ -56,7 +56,10 @@ then
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	fi
-	echo "updated to $newstate from $oldstate on `date` $killed" | mail -s `hostname` cristianradam@gmail.com
+	echo "updated to `cat gitstate.txt` \n
+	  $newstate \n
+	  $oldstate \n
+	  on `date` $killed )" | mail -s `hostname` cristianradam@gmail.com
 fi
 
 sleep 5
