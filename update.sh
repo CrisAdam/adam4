@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#test update
+#test update2
 activeDir=/home/ec2-user/adam4/run
 gitDir=/home/ec2-user/adam4
 config=`cat /home/ec2-user/config.txt`
