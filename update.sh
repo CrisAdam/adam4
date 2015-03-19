@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#test update4
+#test update5
 
 gitDir=$HOME/adam4
 activeDir=$gitDir/run
