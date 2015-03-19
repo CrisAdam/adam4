@@ -66,7 +66,7 @@ public class Network
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients)
                     {
-                    	new ClientHandler(clientSocket);
+                    	new Thread(new ClientHandler(clientSocket)).start();
                     }
                     else
                     {
