@@ -56,7 +56,6 @@ then
 			fi
 		fi
 	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
-	fi
 	mail=`echo -e "updated to \n"`
 	gitstate=`cat gitstate.txt`
 	mail=`echo -e "$mail $gitstate \n"`
@@ -64,10 +63,14 @@ then
 	mail=`echo -e "$mail  $newstate \n"`
 	mail=$mail`date` $killed
 	echo $mail | mail -s `hostname` cristianradam@gmail.com
+	else
+		echo -e "failed compile to `cat gitstate.txt`
+	   on `date`  )" | mail -s `hostname` cristianradam@gmail.com
+	fi
+	
 	
 else
-	echo -e "failed compile to `cat gitstate.txt`
-	   on `date`  )" | mail -s `hostname` cristianradam@gmail.com
+	
 fi
 
 sleep 5
