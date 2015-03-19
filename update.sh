@@ -49,6 +49,8 @@ then
 			done
 			if [ $sleepTimer -eq 30 ]
 			then
+			killed=`pgrep java`
+			killed=`echo "had to force kill $killed"`
 			pkill -9 java
 			fi
 		fi
