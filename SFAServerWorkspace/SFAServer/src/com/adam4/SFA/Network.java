@@ -23,6 +23,7 @@ public class Network
 
     Network()
     {
+    	acceptingNewClients = new AtomicBoolean();
         clientListener = new ClientListener();
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();

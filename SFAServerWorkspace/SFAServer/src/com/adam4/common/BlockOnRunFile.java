@@ -70,6 +70,7 @@ public class BlockOnRunFile
                             }
                         }
                     }
+                    Thread.sleep(1000);
                 }
                 catch (Exception e)
                 {
@@ -81,7 +82,6 @@ public class BlockOnRunFile
         }
         catch (IOException e1)
         {
-
             Common.log.logMessage(e1, LogLevel.ERROR);
         }
     }
