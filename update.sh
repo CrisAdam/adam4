@@ -68,9 +68,6 @@ then
 	   on `date`  )" | mail -s `hostname` cristianradam@gmail.com
 	fi
 	
-	
-else
-	
 fi
 
 sleep 5
