@@ -40,6 +40,7 @@ public class BlockOnRunFile
             // reset key to allow new events to be detected
             while (key.reset())
             {
+            	Common.log.logMessage("Log file key reset loop", LogLevel.DEBUG);
                 try
                 {
                     for (WatchEvent<?> event : key.pollEvents())
@@ -50,6 +51,7 @@ public class BlockOnRunFile
                             Common.log.logMessage("File watcher overflow", LogLevel.INFO);
                             if (!watchedFile.exists())
                             {
+                            	Common.log.logMessage("File watcher file exists loop", LogLevel.INFO);
                                 // do nothing
                                 ;
                             }
