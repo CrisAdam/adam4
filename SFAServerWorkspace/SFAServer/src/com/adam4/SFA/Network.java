@@ -63,6 +63,7 @@ public class Network
             {
                 try
                 {
+                	 Common.log.logMessage("new connection loop", MyLogger.LogLevel.DEBUG);
                     serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients.get())
