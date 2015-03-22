@@ -36,11 +36,13 @@ public class BlockOnRunFile
         {
             WatchKey key;
             key = path.register(watcher, StandardWatchEventKinds.ENTRY_DELETE);
+            
             // stall until the game is supposed to end
             // reset key to allow new events to be detected
             while (key.reset())
             {
-            	Common.log.logMessage("Log file key reset loop", LogLevel.DEBUG);
+            	
+         //   	key = watcher.take();
                 try
                 {
                     for (WatchEvent<?> event : key.pollEvents())

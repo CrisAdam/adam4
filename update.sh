@@ -20,20 +20,20 @@ if [ "$oldstate" != "$newstate" ]
 then
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
-
+	m -r /home/ec2-user/run/com
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
-	/opt/jdk1.8.0_40/bin/javac $(find $srcDir -name *.java)
+	/opt/jdk1.8.0_40/bin/javac -d $HOME/run/ $(find $srcDir -name *.java)
 
 	if [ $? -eq 0 ]
 	then
 		echo "successful compile"
-		if [ -a /home/ec2-user/adam4/SFAServer.run ]
+		if [ -a $HOME/SFAServer.run ]
 		then
 			echo "run file exists, deleting"
-			rm /home/ec2-user/adam4/SFAServer.run
+			rm $HOME/SFAServer.run
 			sleepTimer=0
 			while [  $sleepTimer -lt 30 ]; do
 				sleep 1
@@ -55,7 +55,7 @@ then
 			pkill -9 java
 			fi
 		fi
-	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+	cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	mail=`echo -e "updated to \n"`
 	gitstate=`cat gitstate.txt`
 	mail=`echo -e "$mail $gitstate \n"`
@@ -80,7 +80,7 @@ else
 	startTimer=0
 			while [  $startTimer -lt 10 ]; do
 				sleep 1
-				if [ -a /home/ec2-user/adam4/SFAServer.run ]
+				if [ -a $HOME/SFAServer.run ]
 				then
 					startTimer=40
 				fi
