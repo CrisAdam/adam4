@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.adam4.common.Common;
 import com.adam4.mylogger.MyLogger;
@@ -12,7 +13,7 @@ import com.adam4.mylogger.MyLogger;
 public class Network
 {
 
-    private static boolean acceptingNewClients;
+    private static AtomicBoolean acceptingNewClients;
 
     private static ClientListener clientListener;
     // private static AdminListener adminListener;
@@ -22,6 +23,7 @@ public class Network
 
     Network()
     {
+    	acceptingNewClients = new AtomicBoolean();
         clientListener = new ClientListener();
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
@@ -30,12 +32,12 @@ public class Network
 
     void acceptNewClients()
     {
-        acceptingNewClients = true;
+        acceptingNewClients.set(true);
     }
 
     void stopAcceptingNewClients()
     {
-        acceptingNewClients = false;
+        acceptingNewClients.set(false);
     }
 
     class ClientListener implements Runnable
@@ -58,14 +60,16 @@ public class Network
         @Override
         public void run()
         {
-            while (acceptingNewClients)
+            while (acceptingNewClients.get())
             {
                 try
                 {
+                	 Common.log.logMessage("new connection loop", MyLogger.LogLevel.DEBUG);
                     serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
-                    if (acceptingNewClients)
+                    if (acceptingNewClients.get())
                     {
+                    	 Common.log.logMessage("new client connected", MyLogger.LogLevel.INFO);
                     	new Thread(new ClientHandler(clientSocket)).start();
                     }
                     else
@@ -84,6 +88,7 @@ public class Network
                     Common.log.logMessage(e, MyLogger.LogLevel.INFO);
                 }
             }
+            Common.log.logMessage("no longer accepting connections", MyLogger.LogLevel.INFO);
         }
 
     }
@@ -104,13 +109,13 @@ public class Network
             {
                 e.printStackTrace();
             }
-            while (acceptingNewClients)
+            while (acceptingNewClients.get())
             {
                 try
                 {
                     serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
-                    if (acceptingNewClients)
+                    if (acceptingNewClients.get())
                     {
                         new ClientHandler(clientSocket);
                     }
