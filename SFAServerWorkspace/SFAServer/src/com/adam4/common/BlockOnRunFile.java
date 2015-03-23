@@ -28,7 +28,6 @@ public class BlockOnRunFile {
         Files.deleteIfExists(watchedFile);
     }
 
-<<<<<<< HEAD
     public void block() {
         try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             final WatchKey key = watchedFile.getParent().register(watcher,
@@ -42,51 +41,6 @@ public class BlockOnRunFile {
                 if (key != watcher.take()) {
                     throw new IllegalStateException(
                             "Only our key is registered, only it should be taken");
-=======
-    public void block()
-    {
-        try
-        {
-            WatchKey key;
-            key = path.register(watcher, StandardWatchEventKinds.ENTRY_DELETE);
-            
-            // stall until the game is supposed to end
-            // reset key to allow new events to be detected
-            while (key.reset())
-            {
-            	
-         //   	key = watcher.take();
-                try
-                {
-                    for (WatchEvent<?> event : key.pollEvents())
-                    {
-                        WatchEvent.Kind<?> kind = event.kind();
-                        if (kind == StandardWatchEventKinds.OVERFLOW)
-                        {
-                            Common.log.logMessage("File watcher overflow", LogLevel.INFO);
-                            if (!watchedFile.exists())
-                            {
-                            	Common.log.logMessage("File watcher file exists loop", LogLevel.INFO);
-                                // do nothing
-                                ;
-                            }
-                            break;
-                        }
-                        if (kind == StandardWatchEventKinds.ENTRY_DELETE)
-                        {
-                            @SuppressWarnings("unchecked")
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                            Path filename = ev.context();
-                            if (filename.toAbsolutePath().toString().equals(watchedFile.getAbsolutePath().toString()))
-                            {
-                                watcher.close();
-                                Common.log.logMessage("watchedFile file has been deleted", LogLevel.INFO);
-                                break;
-                            }
-                        }
-                    }
-                    Thread.sleep(1000);
->>>>>>> afdf2a7ff41d1078a219d5a14cbb5b9ae6366d33
                 }
 
                 // now, we know something has changed in the directory, all we
@@ -94,16 +48,9 @@ public class BlockOnRunFile {
                 if (!Files.exists(watchedFile)) {
                     return;
                 }
-<<<<<<< HEAD
 
             }
         } catch (IOException e1) {
-=======
-            }// end while loop
-        }
-        catch (IOException e1)
-        {
->>>>>>> afdf2a7ff41d1078a219d5a14cbb5b9ae6366d33
             Common.log.logMessage(e1, LogLevel.ERROR);
         } catch (InterruptedException e) {
             // propagate an interrupt... we can't handle it here.....
