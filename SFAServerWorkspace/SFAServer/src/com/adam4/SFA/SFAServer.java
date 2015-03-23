@@ -30,7 +30,7 @@ public class SFAServer
 
     // private variables
     private static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
-    private static ConcurrentLinkedQueue<Client> clients = new ConcurrentLinkedQueue<Client>();
+    private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
     private static Network network = new Network();
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
 
@@ -58,7 +58,7 @@ public class SFAServer
 
     }
 
-    public void joinGame(ConcurrentLinkedQueue<Client> playersJoining)
+    public void joinGame(ConcurrentLinkedQueue<ClientHandler> playersJoining)
     {
         for (Game g : games)
         {
@@ -74,7 +74,7 @@ public class SFAServer
 
     }
 
-    public void createGame(ConcurrentLinkedQueue<Client> clients)
+    public void createGame(ConcurrentLinkedQueue<ClientHandler> clients)
     {
         Game temp = new Game();
         temp.addClients(clients);
@@ -146,12 +146,12 @@ public class SFAServer
         br.close();
     }
 
-    static void addPlayer(Client client)
+    static void addPlayer(ClientHandler client)
     {
         clients.add(client);
     }
 
-    static void removePlayer(Client client)
+    static void removePlayer(ClientHandler client)
     {
         clients.remove(client);
     }
@@ -163,7 +163,7 @@ public class SFAServer
         {
             g.endGame();
         }
-        for (Client c : clients)
+        for (ClientHandler c : clients)
         {
             c.disconnect("Server is going down");
         }

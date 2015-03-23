@@ -18,12 +18,11 @@ public class ClientHandler implements Runnable
 	Socket clientSocket;
 	boolean loggedIn = false;
 	boolean inGame = false;
-	Client client;
+	String password;
 
 	ClientHandler(Socket connection)
 	{
 		clientSocket = connection;
-		client = new Client(this);
 		
 	}
 
@@ -72,11 +71,11 @@ public class ClientHandler implements Runnable
 				Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 			}
 
-			String switchStr = message.command;
+			String switchStr = message.command.toUpperCase();
 			
 			switch (switchStr)	// requires java 7 to switch on string
 			{
-				case "user": // connect
+				case "USER": // connect
 				{
 					connect(message);
 					break;
@@ -154,7 +153,7 @@ public class ClientHandler implements Runnable
 
 	private void setPassword(ParsedMessage message) 
 	{
-		client.password = message.args[0];
+		password = message.args[0];
 	}
 
 	private void connect(ParsedMessage message)

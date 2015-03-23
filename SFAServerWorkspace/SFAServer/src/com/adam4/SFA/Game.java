@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Game
 {
-    private LinkedList<Client> clients;
+    private LinkedList<ClientHandler> clients;
     double updatesPerSecond;
     private boolean started;
     private Thread physicsThread;
@@ -17,7 +17,7 @@ public class Game
     {
         started = false;
         paused = true;
-        clients = new LinkedList<Client>();
+        clients = new LinkedList<ClientHandler>();
         updatesPerSecond = 66; // starting with an optimistic number
 
         physics = new Physics(this);
@@ -37,7 +37,7 @@ public class Game
 
     void endGame()
     {
-        for (Client c : clients)
+        for (ClientHandler c : clients)
         {
             SFAServer.addPlayer(c);
         }
@@ -48,9 +48,9 @@ public class Game
         return !paused;
     }
 
-    public void addClients(ConcurrentLinkedQueue<Client> newClients)
+    public void addClients(ConcurrentLinkedQueue<ClientHandler> newClients)
     {
-        for (Client c : newClients)
+        for (ClientHandler c : newClients)
         {
             clients.add(c);
         }
