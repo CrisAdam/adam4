@@ -16,6 +16,8 @@ cd $gitDir && git pull
 
 newstate=`git log -1 | grep "commit"`
 
+echo "old: $oldstate new: $newstate"
+
 if [ "$oldstate" != "$newstate" ]
 then
 	#remove unrelated projects
@@ -36,13 +38,14 @@ then
 			rm $HOME/SFAServer.run
 			sleepTimer=0
 			while [  $sleepTimer -lt 30 ]; do
+				echo "waiting up to $sleepTimer /30 seconds for shutdown"
 				sleep 1
 				check=`pgrep java | wc -w`
 				if [ $check -eq 0 ]
 				then
 					let sleepTimer=sleepTimer+60
 				else
-					echo "waiting up to $sleepTimer /30 seconds for shutdown"
+					
 				fi
 				let sleepTimer=sleepTimer+1
 				
@@ -79,13 +82,14 @@ then
 else
 	startTimer=0
 			while [  $startTimer -lt 10 ]; do
+				echo "waiting up to $startTimer /10 seconds for startup"
 				sleep 1
 				if [ -a $HOME/SFAServer.run ]
 				then
 					startTimer=40
 				fi
 				let startTimer=startTimer+1
-				echo "waiting up to $startTimer /10 seconds for startup"
+				
 			done
 			if [ $startTimer -eq 10 ]
 			then
