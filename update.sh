@@ -44,8 +44,6 @@ then
 				if [ $check -eq 0 ]
 				then
 					let sleepTimer=sleepTimer+60
-				else
-					
 				fi
 				let sleepTimer=sleepTimer+1
 				
