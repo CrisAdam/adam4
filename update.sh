@@ -27,7 +27,7 @@ then
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
-	/opt/jdk1.8.0_40/bin/javac -cp .:$srcDir/../lib/ -d $HOME/run/ $(find $srcDir -name *.java)
+	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar -d $HOME/run/ $(find $srcDir -name *.java)
 
 	if [ $? -eq 0 ]
 	then
