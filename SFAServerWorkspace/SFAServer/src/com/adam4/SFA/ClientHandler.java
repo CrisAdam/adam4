@@ -5,20 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.sql.SQLException;
 
 import com.adam4.common.Common;
 import com.adam4.irc.IRC;
 import com.adam4.irc.ParsedMessage;
 import com.adam4.mylogger.MyLogger;
-import com.adam4.mylogger.MyLogger.LogLevel;
 
 public class ClientHandler implements Runnable
 {
 	Socket clientSocket;
-	boolean loggedIn = false;
-	boolean inGame = false;
-	String password;
+	int currentGame = 0;  // 0 means not in game
+	int clientID = 0;  // 0 = not logged in
+	String password, user, nick;
 
 	ClientHandler(Socket connection)
 	{
@@ -75,70 +74,48 @@ public class ClientHandler implements Runnable
 			
 			switch (switchStr)	// requires java 7 to switch on string
 			{
+				case "PING":
+				{
+					ping(message);
+					break;
+				}	
+				case "PONG":
+				{
+					pong(message);
+					break;
+				}
+				case "REGISTER": // join (new account)
+				{
+					register(message);
+					break;
+				}
+				case "PASS": 
+				{
+					password = message.args[0];
+					break;
+				}
+				case "NICK": // set nickname
+				{
+					nick = message.args[0];
+					break;
+				}
 				case "USER": // connect
 				{
-					connect(message);
+					user(message);
 					break;
 				}
-				case "d": // disconnect
+				case "READY":
 				{
-					disconnect("");
+					ready(message);
 					break;
 				}
-				case "e": // enter game
+				case "MOTD":
 				{
-					if (loggedIn)
-					{
-						enter(message);
-					}
+					motd();
 					break;
 				}
-				case "i": // game input
-				{
-					if (loggedIn && inGame)
-					{
-						recieveInput(message);
-					}
-					break;
-				}
-				case "j": // join (new account)
-				{
-					join(message);
-					break;
-				}
-				case "g": // get available games
-				{
-					getGames();
-					break;
-				}
-				case "PASS": // connect
-				{
-					setPassword(message);
-					break;
-				}
+				
 
-				case "r": // toggle ready status
-				{
-					if (loggedIn && inGame)
-					{
-						ready(message);
-					}
-					break;
-				}
-
-				case "s": // select ship
-				{
-					if (loggedIn && inGame)
-					{
-						selectShip(message);
-					}
-					break;
-				}
-				case "u": // update info
-				{
-					updateInfo(message);
-					break;
-				}
 
 				default:
 				{
@@ -151,97 +128,114 @@ public class ClientHandler implements Runnable
 		}
 	}
 
-	private void setPassword(ParsedMessage message) 
+
+
+
+
+
+
+	private void ping(ParsedMessage message) 
 	{
-		password = message.args[0];
+		Network.sendMessage(clientSocket, new ParsedMessage("PONG", message.trailing));
 	}
 
-	private void connect(ParsedMessage message)
-	{
-		//TODO: fix the [params
-		String[] params = message.command.split(Common.SEPARATOR);
-		// 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
-		String playerName = params[1];
-		String password = params[2] + playerName;
-		String version = params[4];
-		if (!Common.isGoodUserName(playerName))
-		{
-			Network.sendError(clientSocket, "bad user name: " + playerName);
-			Common.log
-					.logMessage("bad user name: " + playerName, LogLevel.INFO);
-			return;
-		}
-		
-	//	if ()
-	}
-
-	public void disconnect(String reason)
-	{
-		loggedIn = false;
-		inGame = false;
-		Network.sendError(clientSocket, reason);
-		try
-		{
-			clientSocket.close();
-		}
-		catch (IOException e)
-		{
-			Common.log.logMessage(e, MyLogger.LogLevel.INFO);
-		}
-	}
-
-	private void enter(ParsedMessage message)
-	{
-		// Enter game function
-
-	}
-
-	private void getGames()
+	private void pong(ParsedMessage message) 
 	{
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	private void join(ParsedMessage message)
+	private void register(ParsedMessage message)
 	{
-		String[] params = message.command.split(Common.SEPARATOR);
-		// 1 = name, 2 = password, 3 = clientType, 4 = clientVersion
-		String playerName = params[1];
-		String password = params[2] + playerName;
-		String version = params[4];
-		if (!Common.isGoodUserName(playerName))
+		//TODO: finish this
+	}
+	
+	private void user(ParsedMessage message) 
+	{
+		if (password != "")
 		{
-			System.out.println(message.args);
-			System.out.println(params[0] + "  " + params[1] + "  " + params[3]);
-			Network.sendError(clientSocket, "bad user name: " + playerName);
-			Common.log
-					.logMessage("bad user name: " + playerName, LogLevel.INFO);
-			return;
+			Network.sendError(clientSocket, "no password recieved");
+		}
+		else if (!Common.isGoodUserName(nick))
+		{
+			Network.sendError(clientSocket, "bad nickname");
+		}
+		else if (user != "")
+		{
+			Network.sendError(clientSocket, "no user recieved");
+		}
+		else
+		{
+			Network.sendMOTD(clientSocket);
+		}
+		if (SFAServer.clientDatabasePool.isConnected())
+		{
+			// TODO finish login checks
+			try 
+			{
+				SFAServer.clientDatabasePool.getConnection().prepareStatement("sql");
+			}
+			catch (SQLException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		
+	}
+	
+	private void ready(ParsedMessage message) 
+	{
+		if (currentGame == 0)
+		{
+			Network.sendError(clientSocket, "unable to process ready state, client is not in game");
+		}
+		else
+		{
+			// TODO: finish
+		}
+		
+	}
+	
+	private void motd() 
+	{
+		Network.sendMOTD(clientSocket);
+	}
+
+	public void quit(String reason)
+	{
+		clientID = 0;
+		currentGame= 0;
+		
+		for (Game g : SFAServer.games)
+		{
+			if (g.gameID == currentGame)
+			{
+				for (ClientHandler c : g.clients)
+				{
+					//  send message to self in case of server-caused reason
+					c.notice(nick + " has quit: " + reason);
+				}
+			}
+		}
+		
+		while (!clientSocket.isClosed())
+		{
+			try
+			{
+				clientSocket.close();
+			}
+			catch (IOException e)
+			{
+				Common.log.logMessage(e, MyLogger.LogLevel.INFO);
+			}
 		}
 	}
 
-	private void ready(ParsedMessage message)
+	private void notice(String notice) 
 	{
-		// toggle ready status (must be in game)
-
+		Network.sendMessage(clientSocket, new ParsedMessage("NOTICE", notice));
 	}
 
-	private void recieveInput(ParsedMessage message)
-	{
-		// must be in game
-
-	}
-
-	private void selectShip(ParsedMessage message)
-	{
-		// must be in game
-
-	}
-
-	private void updateInfo(ParsedMessage message)
-	{
-		// update password or e-mail
-
-	}
 
 }

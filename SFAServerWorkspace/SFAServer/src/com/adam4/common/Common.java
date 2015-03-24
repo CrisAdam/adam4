@@ -1,10 +1,8 @@
 package com.adam4.common;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -14,7 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
@@ -134,6 +133,20 @@ public class Common
             return false;
         }
         return !input.matches("^.*[^a-zA-Z0-9].*$");
+    }
+    
+
+    public static Boolean isValidEmailString(String input)
+    {
+	
+    	boolean result = true;
+    	   try {
+    	      InternetAddress emailAddr = new InternetAddress(input);
+    	      emailAddr.validate();
+    	   } catch (AddressException ex) {
+    	      result = false;
+    	   }
+    	   return result;
     }
 
     static String getSystem()

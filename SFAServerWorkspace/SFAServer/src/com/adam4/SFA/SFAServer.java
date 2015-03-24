@@ -29,7 +29,7 @@ public class SFAServer
     static DatabaseConnectionPool clientDatabasePool;
 
     // private variables
-    private static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
+    public static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
     private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
     private static Network network = new Network();
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
@@ -165,7 +165,7 @@ public class SFAServer
         }
         for (ClientHandler c : clients)
         {
-            c.disconnect("Server is going down");
+            c.quit("Server is going down");
         }
     }
 

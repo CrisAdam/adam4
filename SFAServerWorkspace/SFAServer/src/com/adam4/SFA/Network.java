@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.adam4.common.Common;
+import com.adam4.irc.ParsedMessage;
 import com.adam4.mylogger.MyLogger;
 
 public class Network
@@ -167,5 +168,27 @@ public class Network
             Common.log.logMessage(e, MyLogger.LogLevel.WARN);
         }
     }
+    
+    public static void sendMessage(Socket s, ParsedMessage message)
+    {
+        try
+        {
+            s.getOutputStream().write((message.toString().getBytes(Common.ENCODING)));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
+        }
+        catch (IOException e)
+        {
+            Common.log.logMessage(e, MyLogger.LogLevel.WARN);
+        }
+    }
+
+	public static void sendMOTD(Socket clientSocket) 
+	{
+		String MOTD = "Hello and welcome to the SFA Server!";
+		sendMessage(clientSocket, new ParsedMessage("MOTD", MOTD));
+	}
 
 }

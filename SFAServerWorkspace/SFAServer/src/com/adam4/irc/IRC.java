@@ -1,7 +1,5 @@
 package com.adam4.irc;
 
-import com.adam4.spacenet.ClientHandler;
-
 public class IRC
 {
     public static ParsedMessage parseLine(String line)

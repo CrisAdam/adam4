@@ -5,13 +5,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Game
 {
-    private LinkedList<ClientHandler> clients;
+    public LinkedList<ClientHandler> clients;
     double updatesPerSecond;
     private boolean started;
     private Thread physicsThread;
     private Physics physics;
     private boolean paused;
     public int getOpenSpots;
+	public int gameID;
 
     public Game()
     {
