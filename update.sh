@@ -77,6 +77,7 @@ if [ -a $HOME/SFAServer.run ]
 then
 	echo "run file found"
 else
+	cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	startTimer=0
 		while [  $startTimer -lt 10 ]; do
 			echo "waiting up to $startTimer /10 seconds for startup"
@@ -90,8 +91,7 @@ else
 		done
 		if [ $startTimer -eq 10 ]
 		then
-			cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
-			echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
+			echo "run file missing, unable to restart `date`" | mail -s `hostname` cristianradam@gmail.com
 		fi
 	
 fi
