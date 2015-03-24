@@ -27,7 +27,7 @@ then
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
-	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar -d $HOME/run/ $(find $srcDir -name *.java)
+	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar -d $HOME/run/ $(find $srcDir -name *.java)
 
 	if [ $? -eq 0 ]
 	then
@@ -56,7 +56,7 @@ then
 			pkill -9 java
 			fi
 		fi
-	cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+	cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	mail=`echo -e "updated to \n"`
 	gitstate=`cat gitstate.txt`
 	mail=`echo -e "$mail $gitstate \n"`
@@ -89,7 +89,7 @@ else
 		done
 		if [ $startTimer -eq 10 ]
 		then
-			cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+			cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 			echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
 		fi
 	
