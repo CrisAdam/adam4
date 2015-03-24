@@ -27,7 +27,7 @@ then
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
-	/opt/jdk1.8.0_40/bin/javac -d $HOME/run/ $(find $srcDir -name *.java)
+	/opt/jdk1.8.0_40/bin/javac -cp /lib/*.jar -d $HOME/run/ $(find $srcDir -name *.java)
 
 	if [ $? -eq 0 ]
 	then
@@ -70,8 +70,6 @@ then
 	fi
 	
 fi
-
-sleep 5
 
 #check for successful running instance, else restart
 if [ -a /home/ec2-user/adam4/SFAServer.run ]
