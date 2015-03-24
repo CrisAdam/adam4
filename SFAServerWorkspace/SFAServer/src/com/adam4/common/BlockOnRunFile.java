@@ -21,6 +21,7 @@ public class BlockOnRunFile {
         // in.
         Files.createDirectories(watchedFile.getParent());
         Files.createFile(watchedFile);
+        Common.log.logMessage("Created watch file at " + watchedFile.toString(), LogLevel.INFO);
 
     }
 
