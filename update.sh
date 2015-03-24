@@ -56,7 +56,7 @@ then
 			pkill -9 java
 			fi
 		fi
-	cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+	nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
 	mail=`echo -e "updated to \n"`
 	gitstate=`cat gitstate.txt`
 	mail=`echo -e "$mail $gitstate \n"`
@@ -72,26 +72,26 @@ then
 fi
 
 #check for successful running instance, else restart
-if [ -a /home/ec2-user/adam4/SFAServer.run ]
+if [ -a $HOME/SFAServer.run ]
 then
 	echo "run file found"
 else
 	startTimer=0
-			while [  $startTimer -lt 10 ]; do
-				echo "waiting up to $startTimer /10 seconds for startup"
-				sleep 1
-				if [ -a $HOME/SFAServer.run ]
-				then
-					startTimer=40
-				fi
-				let startTimer=startTimer+1
-				
-			done
-			if [ $startTimer -eq 10 ]
+		while [  $startTimer -lt 10 ]; do
+			echo "waiting up to $startTimer /10 seconds for startup"
+			sleep 1
+			if [ -a $HOME/SFAServer.run ]
 			then
-				nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/ com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
-				echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
+				startTimer=40
 			fi
+			let startTimer=startTimer+1
+				
+		done
+		if [ $startTimer -eq 10 ]
+		then
+			nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar com.adam4.SFA.SFAServer $config >> /dev/null 2>> /dev/null &
+			echo "run file missing - restarting `date`" | mail -s `hostname` cristianradam@gmail.com
+		fi
 	
 fi
 
