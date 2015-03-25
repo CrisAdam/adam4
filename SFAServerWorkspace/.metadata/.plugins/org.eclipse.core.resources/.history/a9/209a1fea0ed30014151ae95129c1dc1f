@@ -50,12 +50,11 @@ public class Network
         {
             try
             {
-                serverSocket = new ServerSocket(SFAServer.clientPort);
+                serverSocket = new ServerSocket();
             }
             catch (Exception e)
             {
                 Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
-                SFAServer.endServer();
             }
         }
 

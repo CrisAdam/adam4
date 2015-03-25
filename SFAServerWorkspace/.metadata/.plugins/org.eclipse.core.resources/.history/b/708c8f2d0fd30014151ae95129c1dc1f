@@ -24,7 +24,6 @@ public class SFAServer
     public final static Double rootQuadTreeSize = 10000.0;
     public final static Double timeConstant = 0.000000001;
     public final static String version = "1.0.1";
-    
 
     // class variables
     static DatabaseConnectionPool clientDatabasePool;
@@ -35,7 +34,6 @@ public class SFAServer
     private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
     private static Network network = new Network();
     private static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
-    private static BlockOnRunFile block = new BlockOnRunFile(runFilePath);
 
     public static void main(String[] args) throws Exception
     {
@@ -52,7 +50,7 @@ public class SFAServer
 
         // the run file is so that the server can (softly) terminate the program
         // by deleting it
-        
+        BlockOnRunFile block = new BlockOnRunFile(runFilePath);
         block.block();
         
         Common.log.logMessage("SFA Server ending", LogLevel.DEBUG);
@@ -161,6 +159,7 @@ public class SFAServer
 
     public static void endServer()
     {
+    	block.end();
         network.stopAcceptingNewClients();
         for (Game g : games)
         {
@@ -170,24 +169,6 @@ public class SFAServer
         {
             c.quit("Server is going down");
         }
-    	try 
-    	{
-			block.end();
-		} 
-    	catch (IOException e) 
-    	{
-    		Common.log.logMessage("Unable to delete run file, terminating", LogLevel.ERROR);
-			for (Thread t : Thread.getAllStackTraces().keySet()) 
-			{  if (t.getState()==Thread.State.RUNNABLE) 
-			     t.interrupt(); 
-			} 
-
-			for (Thread t : Thread.getAllStackTraces().keySet()) 
-			{  if (t.getState()==Thread.State.RUNNABLE) 
-			     t.stop(); 
-			}
-			e.printStackTrace();
-		}
     }
 
 }

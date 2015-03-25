@@ -19,6 +19,10 @@ compile()
 	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar -d $HOME/run/ $(find $srcDir -name *.java)
 	
 	compileresult=$?
+	if [ $compileresult -eq 0 ]
+	then
+		echo "successful compile"
+	fi
 }
 
 email()
@@ -89,26 +93,29 @@ cd $gitDir && git pull
 
 newstate=`git log -1 | grep "commit"`
 
-echo "old: $oldstate new: $newstate"
-
-if [ "$oldstate" != "$newstate" ]
+if [ ! -z "$1" ] 
 then
-	compile
-	if [ $compileresult -eq 0 ]
+	#compile
+	waitForShutdown
+	run
+else
+	echo "old: $oldstate new: $newstate"
+
+	if [ "$oldstate" != "$newstate" ]
 	then
-		echo "successful compile"
-		waitForShutdown
-		run
-	else
-	echo "\n failed compile " >> gitstate.txt
+		compile
+		if [ $compileresult -eq 0 ]
+		then
+			waitForShutdown
+			run
+		else
+		echo "\n failed compile " >> gitstate.txt
+		fi
 	fi
 fi
 
-if [ ! -z "$1" ] 
-then
-	compile
-	waitForShutdown
-	run
-fi
+
+
+
 
 

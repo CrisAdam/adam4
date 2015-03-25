@@ -55,7 +55,6 @@ public class Network
             catch (Exception e)
             {
                 Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
-                SFAServer.endServer();
             }
         }
 

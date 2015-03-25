@@ -159,8 +159,9 @@ public class SFAServer
         clients.remove(client);
     }
 
-    public static void endServer()
+    public static void endServer() throws IOException
     {
+    	block.end();
         network.stopAcceptingNewClients();
         for (Game g : games)
         {
@@ -170,24 +171,6 @@ public class SFAServer
         {
             c.quit("Server is going down");
         }
-    	try 
-    	{
-			block.end();
-		} 
-    	catch (IOException e) 
-    	{
-    		Common.log.logMessage("Unable to delete run file, terminating", LogLevel.ERROR);
-			for (Thread t : Thread.getAllStackTraces().keySet()) 
-			{  if (t.getState()==Thread.State.RUNNABLE) 
-			     t.interrupt(); 
-			} 
-
-			for (Thread t : Thread.getAllStackTraces().keySet()) 
-			{  if (t.getState()==Thread.State.RUNNABLE) 
-			     t.stop(); 
-			}
-			e.printStackTrace();
-		}
     }
 
 }

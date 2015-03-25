@@ -46,7 +46,7 @@ public class Network
 
         ServerSocket serverSocket = null;
 
-        ClientListener()
+        ClientListener() throws IOException
         {
             try
             {

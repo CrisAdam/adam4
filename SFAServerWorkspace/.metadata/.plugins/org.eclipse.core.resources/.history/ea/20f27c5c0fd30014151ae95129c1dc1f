@@ -28,7 +28,8 @@ public class BlockOnRunFile {
 		} 
         catch (IOException e) 
         {
-        	Common.log.logMessage("Unable to create watch file" + watchedFile.toString(), LogLevel.ERROR);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 

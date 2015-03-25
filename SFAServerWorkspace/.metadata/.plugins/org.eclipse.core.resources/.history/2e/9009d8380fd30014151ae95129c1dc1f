@@ -14,23 +14,14 @@ import com.adam4.mylogger.MyLogger.LogLevel;
 public class BlockOnRunFile {
     private final Path watchedFile;
 
-    public BlockOnRunFile(String runFilePath)
-    {
+    public BlockOnRunFile(String runFilePath) throws IOException {
         watchedFile = Paths.get(runFilePath).toAbsolutePath();
-        try 
-        {
-			Files.deleteIfExists(watchedFile);
-	        // create entire directory tree, if possible, to create our watch file
-	        // in.
-	        Files.createDirectories(watchedFile.getParent());
-	        Files.createFile(watchedFile);
-	        Common.log.logMessage("Created watch file at " + watchedFile.toString(), LogLevel.INFO);
-		} 
-        catch (IOException e) 
-        {
-        	Common.log.logMessage("Unable to create watch file" + watchedFile.toString(), LogLevel.ERROR);
-		}
-
+        Files.deleteIfExists(watchedFile);
+        // create entire directory tree, if possible, to create our watch file
+        // in.
+        Files.createDirectories(watchedFile.getParent());
+        Files.createFile(watchedFile);
+        Common.log.logMessage("Created watch file at " + watchedFile.toString(), LogLevel.INFO);
 
     }
 
