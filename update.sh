@@ -11,7 +11,7 @@ compile()
 {
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
-	rm -r /home/ec2-user/run/com
+	rm -rf /home/ec2-user/run/com
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
