@@ -10,11 +10,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-import com.adam4.SFA.SFAServer;
 import com.adam4.common.Common;
 import com.adam4.dbconnection.SQLRequest;
 import com.adam4.mylogger.MyLogger;
 import com.adam4.mylogger.MyLogger.LogLevel;
+import com.adam4.spacenet.ClientHandler;
+import com.adam4.spacenet.SpaceNetServer;
 
 public class Client
 {
@@ -45,7 +46,7 @@ public class Client
     // 800: super moderator: can promote/demote moderators, see server loads, and move users/groups to different servers
     // 1000: admin: can do everything, including shutdown/reboot of servers
 
-    public Client()//ClientHandler handler)
+    public Client(ClientHandler handler)
     {
         timeRecieved = new LinkedList<Date>();
         sendLevel = 10000; // 10 messages in 10 seconds average
@@ -200,7 +201,7 @@ public class Client
     private void away(ParsedMessage parsed)
     {
         status = Status.AWAY;
-  //      SpaceNetServer.statusChange(this, parsed.trailing);
+        SpaceNetServer.statusChange(this, parsed.trailing);
     }
 
     private void chat()
@@ -223,7 +224,7 @@ public class Client
 
     private void info(ParsedMessage parsed)
     {
-        sendIRCMessage(new ParsedMessage("371", SFAServer.version + " " + Common.getHostName()));
+        sendIRCMessage(new ParsedMessage("371", SpaceNetServer.version + " " + Common.getHostName()));
     }
 
     private void ison(ParsedMessage parsed)
@@ -357,8 +358,8 @@ public class Client
     private void quit(ParsedMessage parsed)
     {
         status = Status.QUIT;
-   //     SpaceNetServer.statusChange(this, parsed.trailing);
-   //     SpaceNetServer.disconnect(this);
+        SpaceNetServer.statusChange(this, parsed.trailing);
+        SpaceNetServer.disconnect(this);
         sendIRCMessage(new ParsedMessage("ERROR", "Quit: " + parsed.trailing));
         try
         {
@@ -405,35 +406,35 @@ public class Client
         userName = parsed.trailing;
         Thread.currentThread().setName("Client " + userName + " thread");
         String login = "SELECT ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE FROM AUTH.CLIENT WHERE CLIENTNAME=\"" + userName + "\";";
-   //     ResultSet result = SpaceNetServer.getClientDatabaseManager().getData(login);
-     //   try
+        ResultSet result = SpaceNetServer.getClientDatabaseManager().getData(login);
+        try
         {
-        //    if (!result.first())
+            if (!result.first())
             {
                 // user does not exist, insert into database
                 String create = "INSERT INTO AUTH.CLIENT (ACCESSLEVEL, CLIENTNAME, HASHEDPASSWORD, LASTLOGINDATE) VALUES ( /* ACCESSLEVEL */ /* CLIENTNAME */, /* HASHEDPASSWORD */, /* LASTLOGINDATE */ );";
                 SQLRequest insert = new SQLRequest(create);
-                //isLoggedIn = SpaceNetServer.getClientDatabaseManager().writeData(insert);
+                isLoggedIn = SpaceNetServer.getClientDatabaseManager().writeData(insert);
                 if (isLoggedIn)
                 {
                     sendIRCMessage(new ParsedMessage("001", "Welcome to the SpaceNet IRC " + userName));
                     motd();
                 }
             }
-     //       else if (result.getString("HASHED_PASSWORD").equals(hashedPassword))
+            else if (result.getString("HASHED_PASSWORD").equals(hashedPassword))
             {
                 motd();
                 isLoggedIn = true;
             }
-       //     else
+            else
             {
                 sendIRCMessage(new ParsedMessage("464", "Password incorrect"));
             }
         }
-       // catch (SQLException e)
+        catch (SQLException e)
         {
             isLoggedIn = false;
-     //       Common.log.logMessage(e, LogLevel.ERROR);
+            Common.log.logMessage(e, LogLevel.ERROR);
         }
 
         if (parsed.args[0].startsWith("8") && privilegeLevel > 100)
@@ -441,9 +442,9 @@ public class Client
             status = Status.INVISIBLE;
         }
         else
-    //    {
+        {
             status = Status.AVAILABLE;
-   //     }
+        }
     }
 
     private void userhost(ParsedMessage parsed)
@@ -466,13 +467,13 @@ public class Client
 
     private void version(ParsedMessage parsed)
     {
-   //     ParsedMessage versionMessage = new ParsedMessage(Common.getHostName(), "351", null, "SpaceNet Server v" + SpaceNetServer.version);
-   //     sendIRCMessage(versionMessage);
+        ParsedMessage versionMessage = new ParsedMessage(Common.getHostName(), "351", null, "SpaceNet Server v" + SpaceNetServer.version);
+        sendIRCMessage(versionMessage);
     }
 
     private void wallops(ParsedMessage parsed)
     {
-     //   SpaceNetServer.wallops(userName, parsed.trailing);
+        SpaceNetServer.wallops(userName, parsed.trailing);
     }
 
     private void watch(ParsedMessage parsed)
