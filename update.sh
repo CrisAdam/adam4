@@ -1,22 +1,35 @@
 #!/bin/bash
 
-#test update5
-
 gitDir=$HOME/adam4
 activeDir=$gitDir/run
 config=`cat $HOME/config.txt`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
+compileresult=1 
 
 compile()
 {
+	echo "compiling"
 	#remove unrelated projects
 	rm -r $srcDir/com/adam4/misc
-	rm -rf /home/ec2-user/run/com
+	rm -rf /home/ec2-user/run/com 2> /dev/null 
 	#remove test files that may not compile
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
 	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar -d $HOME/run/ $(find $srcDir -name *.java)
+	
+	compileresult=$?
+}
+
+email()
+{
+	mail=`echo -e "updated to \n"`
+	gitstate=`cat gitstate.txt`
+	mail=`echo -e "$mail $gitstate \n"`
+	mail=`echo -e "$mail  $oldstate to \n"`
+	mail=`echo -e "$mail  $newstate \n"`
+	mail=$mail`date` $killed
+	echo $mail | mail -s `hostname` cristianradam@gmail.com
 }
 
 waitForShutdown()
@@ -81,19 +94,13 @@ echo "old: $oldstate new: $newstate"
 if [ "$oldstate" != "$newstate" ]
 then
 	compile
-	if [ $? -eq 0 ]
+	if [ $compileresult -eq 0 ]
 	then
 		echo "successful compile"
 		waitForShutdown
 		run
 	else
-	mail=`echo -e "updated to \n"`
-	gitstate=`cat gitstate.txt`
-	mail=`echo -e "$mail $gitstate \n"`
-	mail=`echo -e "$mail  $oldstate to \n"`
-	mail=`echo -e "$mail  $newstate \n"`
-	mail=$mail`date` $killed
-	echo $mail | mail -s `hostname` cristianradam@gmail.com
+	echo "\n failed compile " >> gitstate.txt
 	fi
 fi
 
@@ -103,4 +110,5 @@ then
 	waitForShutdown
 	run
 fi
+
 
