@@ -1,0 +1,56 @@
+package com.adam4.SFA;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
+import com.adam4.irc.ParsedMessage;
+
+public class TestClient
+{
+    static Socket s;
+    static OutputStream output;
+    static InputStream input;
+
+    public static void main(String[] args)
+    {
+        String URL = "localhost";
+        if (args.length > 0)
+        {
+            URL = args[0];
+        }
+        try
+        {
+            s = new Socket(URL, 9898);
+            System.out.println("connected to: " + URL);
+            output = s.getOutputStream();
+            input = s.getInputStream();
+            
+         // send password
+            output.write((new ParsedMessage("PASS", new String[]{"password"}).toString().getBytes("UTF-8")));
+            
+         // send nick
+            output.write((new ParsedMessage("NICK", new String[]{"starfox"}).toString().getBytes("UTF-8")));
+            
+         // send user
+            output.write((new ParsedMessage("USER", new String[]{"cristianradam@gmail.com"}).toString().getBytes("UTF-8")));
+            
+            
+            
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder()));
+
+            // System.out.println(reader.readLine() + i);
+
+            s.close();
+        }
+
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+}

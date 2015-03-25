@@ -1,0 +1,104 @@
+package com.adam4.SFA;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
+import com.adam4.SFA.Network.ClientListener;
+import com.adam4.irc.ParsedMessage;
+
+public class TestClient
+{
+    static Socket s;
+    static OutputStream output;
+
+    public static void main(String[] args)
+    {
+    	
+        String URL = "localhost";
+        if (args.length > 0)
+        {
+            URL = args[0];
+        }
+        try
+        {
+            s = new Socket(URL, 9898);
+            System.out.println("connected to: " + URL);
+            output = s.getOutputStream();
+            
+            
+         // send password
+            output.write((new ParsedMessage("PASS", new String[]{"password"}).toString().getBytes("UTF-8")));
+            
+         // send nick
+            output.write((new ParsedMessage("NICK", new String[]{"starfox"}).toString().getBytes("UTF-8")));
+            
+         // send user
+            output.write((new ParsedMessage("USER", new String[]{"cristian@adam4.com"}).toString().getBytes("UTF-8")));
+            
+            new Thread(new Reader()).start();
+            
+            String consoleInput = "0";
+            while (consoleInput != "")
+            {
+            	
+            }
+            
+            
+            
+
+
+            s.close();
+        }
+
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        
+    }
+    
+    
+}
+
+class Reader implements Runnable
+{
+	Socket s;
+	InputStream input;
+	public void reader(Socket s)
+	{
+		this.s = s;
+		try 
+		{
+			input = s.getInputStream();
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	@Override
+	public void run() 
+	{
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder()));
+		while (!s.isClosed())
+		{
+			try 
+			{
+				System.out.println(reader.readLine());  // print everything recieved to console
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+}

@@ -28,6 +28,7 @@ public class Network
         clientListener = new ClientListener();
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
+        Common.log.logMessage("Network started", MyLogger.LogLevel.DEBUG);
         // adminListener = new AdminListener();
     }
 
@@ -66,12 +67,11 @@ public class Network
             {
                 try
                 {
-                	 Common.log.logMessage("new connection loop", MyLogger.LogLevel.DEBUG);
                     serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
                     if (acceptingNewClients.get())
                     {
-                    	 Common.log.logMessage("new client connected", MyLogger.LogLevel.INFO);
+                    	 Common.log.logMessage("new client connected from " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
                     	new Thread(new ClientHandler(clientSocket)).start();
                     }
                     else
