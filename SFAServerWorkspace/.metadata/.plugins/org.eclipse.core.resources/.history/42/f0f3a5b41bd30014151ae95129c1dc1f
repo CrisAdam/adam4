@@ -20,8 +20,7 @@ public class TestClient
     public static void main(String[] args)
     {
     	
-    	String URL = "54.172.235.102";
-    	//String URL = "localhost";
+        String URL = "54.172.235.102";
         if (args.length > 0)
         {
             URL = args[0];

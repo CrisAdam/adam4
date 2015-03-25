@@ -28,7 +28,7 @@ public class TestClient
         }
         try
         {
-            s = new Socket(URL, 9898);
+            s = new Socket(URL, 9890);
             System.out.println("connected to: " + URL);
             output = s.getOutputStream();
             input = s.getInputStream();

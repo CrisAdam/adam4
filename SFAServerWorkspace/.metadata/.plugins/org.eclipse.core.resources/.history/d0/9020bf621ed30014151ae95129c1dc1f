@@ -72,7 +72,6 @@ public class Network
                     if (acceptingNewClients.get())
                     {
                     	 Common.log.logMessage("new client connected from " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
-                    	 System.out.println("new client connected from " + clientSocket.getInetAddress());
                     	new Thread(new ClientHandler(clientSocket)).start();
                     }
                     else
