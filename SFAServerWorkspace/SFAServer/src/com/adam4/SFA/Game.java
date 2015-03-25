@@ -10,25 +10,28 @@ public class Game
     private boolean started;
     private Thread physicsThread;
     private Physics physics;
-    private boolean paused;
     public int getOpenSpots;
 	public int gameID;
 
     public Game()
     {
-        started = false;
-        paused = true;
+        started = false;  // determines if in lobby state or not
         clients = new LinkedList<ClientHandler>();
         updatesPerSecond = 66; // starting with an optimistic number
 
-        physics = new Physics(this);
-        physicsThread = new Thread(physics);
-        physicsThread.start();
     }
 
     boolean getStarted()
     {
         return started;
+    }
+    
+    private void start()
+    {
+    	started = true;
+    	physics = new Physics(this);
+        physicsThread = new Thread(physics);
+        physicsThread.start();
     }
 
     void moveObjects(long dTime)
@@ -36,17 +39,9 @@ public class Game
         // map.moveObjects(dTime * Server.timeConstant);
     }
 
-    void endGame()
-    {
-        for (ClientHandler c : clients)
-        {
-            SFAServer.addPlayer(c);
-        }
-    }
-
     boolean getRunning()
     {
-        return !paused;
+        return started;
     }
 
     public void addClients(ConcurrentLinkedQueue<ClientHandler> newClients)
@@ -56,5 +51,10 @@ public class Game
             clients.add(c);
         }
     }
+
+	public void endGame() 
+	{
+		started = false;
+	}
 
 }

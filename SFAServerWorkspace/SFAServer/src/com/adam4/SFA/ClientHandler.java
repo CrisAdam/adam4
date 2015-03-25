@@ -180,6 +180,7 @@ public class ClientHandler implements Runnable
 				e.printStackTrace();
 			}
 		}
+		SFAServer.connectedClients.add(this);
 		
 		
 	}
@@ -218,6 +219,8 @@ public class ClientHandler implements Runnable
 				}
 			}
 		}
+		
+		SFAServer.connectedClients.remove(this);
 		
 		while (!clientSocket.isClosed())
 		{

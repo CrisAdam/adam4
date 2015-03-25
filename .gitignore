@@ -1,6 +1,4 @@
 *.class
-*.project
-.metadata/
 RemoteSystemTempFiles/
 bin/
 Temp/
@@ -12,7 +10,6 @@ run
 /Server/dist/
 /Server/Log.txt
 build.xml
-.classpath
 manifest.mf
 server*
 security/

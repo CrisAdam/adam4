@@ -3,8 +3,6 @@ package com.adam4.common;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 

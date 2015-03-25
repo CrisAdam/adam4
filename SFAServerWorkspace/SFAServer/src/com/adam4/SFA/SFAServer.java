@@ -29,6 +29,7 @@ public class SFAServer
     static DatabaseConnectionPool clientDatabasePool;
 
     // private variables
+    public static ConcurrentLinkedQueue<ClientHandler> connectedClients = new ConcurrentLinkedQueue<ClientHandler>();
     public static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
     private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
     private static Network network = new Network();
