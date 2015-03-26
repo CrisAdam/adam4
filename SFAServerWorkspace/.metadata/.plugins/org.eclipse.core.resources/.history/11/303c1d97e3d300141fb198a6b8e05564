@@ -1,0 +1,9 @@
+package com.adam4.SFA;
+
+public class IntegrationTest 
+{
+	public static void main(String args[] )
+	{
+		SFAServer.main(args);
+	}
+}

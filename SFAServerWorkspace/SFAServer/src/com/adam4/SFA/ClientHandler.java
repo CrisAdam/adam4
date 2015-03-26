@@ -27,7 +27,7 @@ public class ClientHandler implements Runnable
 
 	public void run()
 	{
-
+		Thread.currentThread().setName("Client Thread " + clientSocket.getLocalAddress());
 		BufferedReader input = null; // not sure if I need the buffering, but
 										// having the getLine() is nice
 		String unparsedMessage ="";
@@ -48,7 +48,7 @@ public class ClientHandler implements Runnable
 			try
 			{
 				unparsedMessage = input.readLine();
-				if (unparsedMessage.isEmpty())
+				if (unparsedMessage == null || unparsedMessage.isEmpty())
 				{
 					continue;
 				}
@@ -70,6 +70,8 @@ public class ClientHandler implements Runnable
 				Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 			}
 
+			System.out.println("recieved: " + message.toString());
+			
 			String switchStr = message.command.toUpperCase();
 			
 			switch (switchStr)	// requires java 7 to switch on string

@@ -1,0 +1,10 @@
+package com.adam4.SFA;
+
+public class IntegrationTest 
+{
+	public static void main(String args[] ) throws Exception
+	{
+		SFAServer.main(args);
+		TestClient.main(new String[]{"Localhost"});
+	}
+}

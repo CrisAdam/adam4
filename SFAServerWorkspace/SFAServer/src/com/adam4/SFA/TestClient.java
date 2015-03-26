@@ -47,6 +47,7 @@ public class TestClient
             output.write("USER cristian@adam4.com javaTestClient v1.0.0".getBytes("UTF-8"));
             
             String consoleInput = "0";
+            System.out.println("enter quit to exit");
             while (!consoleInput.equals("quit") && !s.isClosed())
             {
             	while (reader.ready())

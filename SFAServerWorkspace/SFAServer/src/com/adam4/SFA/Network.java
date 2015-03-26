@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.adam4.common.Common;
@@ -24,11 +25,11 @@ public class Network
 
     Network()
     {
-    	acceptingNewClients = new AtomicBoolean();
+    	acceptingNewClients = new AtomicBoolean(true);
         clientListener = new ClientListener();
         clientListenerThread = new Thread(clientListener);
         clientListenerThread.start();
-        Common.log.logMessage("Network started", MyLogger.LogLevel.DEBUG);
+        
         // adminListener = new AdminListener();
     }
 
@@ -49,26 +50,33 @@ public class Network
 
         ClientListener()
         {
-            try
-            {
-                serverSocket = new ServerSocket(SFAServer.clientPort);
-            }
-            catch (Exception e)
-            {
-                Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
-                SFAServer.endServer();
-            }
+            
         }
 
         @Override
         public void run()
         {
+        	try
+            {
+                serverSocket = new ServerSocket(SFAServer.clientPort);
+            }
+            catch (Exception e)
+            {
+                Common.log.logMessage("unable to open server socket, ending " + e, MyLogger.LogLevel.ERROR);
+                SFAServer.endServer();
+                return;
+            }
+        	Thread.currentThread().setName("Network Client Main");
+        	Common.log.logMessage("Network started", MyLogger.LogLevel.DEBUG);
+        	acceptNewClients();
             while (acceptingNewClients.get())
             {
                 try
                 {
-                    serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
+                	serverSocket.setSoTimeout(1000);
+                	//serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
+                    System.out.println("recieved connection from " + clientSocket.getLocalAddress());
                     if (acceptingNewClients.get())
                     {
                     	 Common.log.logMessage("new client connected from " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
@@ -80,7 +88,7 @@ public class Network
                     	clientSocket.close();
                     }
                 }
-                catch (SocketException e)
+                catch (SocketTimeoutException e)
                 {
                     ;
                     // do nothing; this is an exit due to SoTimeout such that it
