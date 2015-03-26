@@ -76,7 +76,6 @@ public class Network
                 	serverSocket.setSoTimeout(1000);
                 	//serverSocket.setSoTimeout(SFAServer.ENDCHECKFREQUENCY);
                     Socket clientSocket = serverSocket.accept();
-                    System.out.println("recieved connection from " + clientSocket.getLocalAddress());
                     if (acceptingNewClients.get())
                     {
                     	 Common.log.logMessage("new client connected from " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
@@ -150,55 +149,6 @@ public class Network
 
     }
 
-    public static void sendError(Socket s, String error)
-    {
-
-        if (error.isEmpty())
-        {
-            error = "empty error";
-        }
-        if (!error.substring(0, 1).equals("e" + Common.SEPARATOR))
-        {
-            error = "e" + Common.SEPARATOR + error;
-        }
-        if (error.charAt(error.length() - 1) != '\n')
-        {
-            error += '\n';
-        }
-        try
-        {
-            s.getOutputStream().write((error.getBytes(Common.ENCODING)));
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
-        }
-        catch (IOException e)
-        {
-            Common.log.logMessage(e, MyLogger.LogLevel.WARN);
-        }
-    }
     
-    public static void sendMessage(Socket s, ParsedMessage message)
-    {
-        try
-        {
-            s.getOutputStream().write((message.toString().getBytes(Common.ENCODING)));
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
-        }
-        catch (IOException e)
-        {
-            Common.log.logMessage(e, MyLogger.LogLevel.WARN);
-        }
-    }
-
-	public static void sendMOTD(Socket clientSocket) 
-	{
-		String MOTD = "Hello and welcome to the SFA Server!";
-		sendMessage(clientSocket, new ParsedMessage("MOTD", MOTD));
-	}
 
 }

@@ -3,6 +3,9 @@ package com.adam4.SFA;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -18,7 +21,8 @@ public class ClientHandler implements Runnable
 	int currentGame = 0;  // 0 means not in game
 	int clientID = 0;  // 0 = not logged in
 	String password, user, nick;
-
+	PrintWriter output;
+	
 	ClientHandler(Socket connection)
 	{
 		clientSocket = connection;
@@ -30,31 +34,30 @@ public class ClientHandler implements Runnable
 		Thread.currentThread().setName("Client Thread " + clientSocket.getLocalAddress());
 		BufferedReader input = null; // not sure if I need the buffering, but
 										// having the getLine() is nice
+		
 		String unparsedMessage ="";
 		ParsedMessage message = new ParsedMessage("Error", "unsupported message recieved");
-
+		Common.log.logMessage("client handler created and ran " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
+	
 		try
 		{
 			input = new BufferedReader(new InputStreamReader(
 					clientSocket.getInputStream(),
 					StandardCharsets.UTF_8.newDecoder()));
+			output = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);
 		}
 		catch (IOException e)
 		{
 			Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 		}
-		while (!clientSocket.isClosed())
+	//	while (!clientSocket.isClosed())
 		{
 			try
 			{
-				unparsedMessage = input.readLine();
-				if (unparsedMessage == null || unparsedMessage.isEmpty())
+				while((unparsedMessage = input.readLine()) != null)
 				{
-					continue;
-				}
-				else
-				{
-					message = IRC.parseLine(unparsedMessage);
+					System.out.println("ClientHandler Recieved: " + unparsedMessage);
+					handleMessage(IRC.parseLine(unparsedMessage));
 				}
 			}
 			catch (IOException e)
@@ -69,76 +72,75 @@ public class ClientHandler implements Runnable
 				}
 				Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 			}
+			
+			
+			
+		}
+		Common.log.logMessage("client handler closing: " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
+	}
 
-			System.out.println("recieved: " + message.toString());
-			
-			String switchStr = message.command.toUpperCase();
-			
-			switch (switchStr)	// requires java 7 to switch on string
+	private void handleMessage(ParsedMessage message)
+	{
+		
+		String switchStr = message.command.toUpperCase();
+		
+		switch (switchStr)	// requires java 7 to switch on string
+		{
+			case "PING":
 			{
-				case "PING":
-				{
-					ping(message);
-					break;
-				}	
-				case "PONG":
-				{
-					pong(message);
-					break;
-				}
-				case "REGISTER": // join (new account)
-				{
-					register(message);
-					break;
-				}
-				case "PASS": 
-				{
-					password = message.args[0];
-					break;
-				}
-				case "NICK": // set nickname
-				{
-					nick = message.args[0];
-					break;
-				}
-				case "USER": // connect
-				{
-					user(message);
-					break;
-				}
-				case "READY":
-				{
-					ready(message);
-					break;
-				}
-				case "MOTD":
-				{
-					motd();
-					break;
-				}
-				
+				ping(message);
+				break;
+			}	
+			case "PONG":
+			{
+				pong(message);
+				break;
+			}
+			case "REGISTER": // join (new account)
+			{
+				register(message);
+				break;
+			}
+			case "PASS": 
+			{
+				password = message.args[0];
+				break;
+			}
+			case "NICK": // set nickname
+			{
+				nick = message.args[0];
+				break;
+			}
+			case "USER": // connect
+			{
+				user(message);
+				break;
+			}
+			case "READY":
+			{
+				ready(message);
+				break;
+			}
+			case "MOTD":
+			{
+				motd();
+				break;
+			}
+			
 
 
-				default:
-				{
-					Common.log.logMessage(
-							"unsupported message type" + message.toString(),
-							MyLogger.LogLevel.ERROR);
-					break;
-				}
+			default:
+			{
+				Common.log.logMessage("unsupported message type" + message.toString(), MyLogger.LogLevel.ERROR);
+				break;
 			}
 		}
 	}
 
 
-
-
-
-
-
 	private void ping(ParsedMessage message) 
 	{
-		Network.sendMessage(clientSocket, new ParsedMessage("PONG", message.trailing));
+		sendMessage(new ParsedMessage("PONG", message.args,message.trailing));
 	}
 
 	private void pong(ParsedMessage message) 
@@ -154,22 +156,24 @@ public class ClientHandler implements Runnable
 	
 	private void user(ParsedMessage message) 
 	{
-		if (password != "")
+		if (password == "")
 		{
-			Network.sendError(clientSocket, "no password recieved");
+			sendError("no password recieved");
 		}
 		else if (!Common.isGoodUserName(nick))
 		{
-			Network.sendError(clientSocket, "bad nickname");
+			sendError("bad nickname");
 		}
-		else if (user != "")
+		else if (user == "")
 		{
-			Network.sendError(clientSocket, "no user recieved");
+			sendError("no user recieved");
 		}
 		else
 		{
-			Network.sendMOTD(clientSocket);
+			clientID = 1;
+			motd();
 		}
+		/*
 		if (SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
@@ -181,7 +185,9 @@ public class ClientHandler implements Runnable
 			{
 				e.printStackTrace();
 			}
+			
 		}
+		*/
 		SFAServer.connectedClients.add(this);
 		
 		
@@ -191,7 +197,7 @@ public class ClientHandler implements Runnable
 	{
 		if (currentGame == 0)
 		{
-			Network.sendError(clientSocket, "unable to process ready state, client is not in game");
+			sendError("unable to process ready state, client is not in game");
 		}
 		else
 		{
@@ -202,7 +208,15 @@ public class ClientHandler implements Runnable
 	
 	private void motd() 
 	{
-		Network.sendMOTD(clientSocket);
+		
+		if (clientID != 0)
+		{
+			sendMessage(new ParsedMessage("MOTD", "Hello"));
+		}
+		else
+		{
+			sendError("Not logged in");
+		}
 	}
 
 	public void quit(String reason)
@@ -239,8 +253,32 @@ public class ClientHandler implements Runnable
 
 	private void notice(String notice) 
 	{
-		Network.sendMessage(clientSocket, new ParsedMessage("NOTICE", notice));
+		sendMessage(new ParsedMessage("NOTICE", notice));
 	}
 
+	
+	private void sendError(String error)
+    {
+
+        if (error.isEmpty())
+        {
+            error = "empty error";
+        }
+        if (!error.substring(0, 5).equals("ERROR "))
+        {
+            error = "ERROR " + error;
+        }
+        if (error.charAt(error.length() - 1) != '\n')
+        {
+            error += '\n';
+        }
+        output.write(error);
+    }
+    
+    private void sendMessage(ParsedMessage message)
+    {
+    	System.out.println("Server sent: " + message);
+        output.write(message.toString());
+    }
 
 }

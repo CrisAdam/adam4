@@ -33,7 +33,7 @@ public class SFAServer
     public static ConcurrentLinkedQueue<ClientHandler> connectedClients = new ConcurrentLinkedQueue<ClientHandler>();
     public static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
     private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
-    private static Network network = new Network();
+    private static Network network;
     public final static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
     private static BlockOnRunFile block = new BlockOnRunFile(runFilePath);
 
@@ -50,7 +50,7 @@ public class SFAServer
 
         Common.log.logMessage("SFA Server started", LogLevel.DEBUG);
         
-        new Network();
+        network = new Network();
 
         // the run file is so that the server can (softly) terminate the program
         // by deleting it
