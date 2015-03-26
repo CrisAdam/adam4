@@ -56,7 +56,6 @@ public class Network
         @Override
         public void run()
         {
-        	Thread.currentThread().setName("Network Client Main");
         	try
             {
                 serverSocket = new ServerSocket(SFAServer.clientPort);
@@ -67,6 +66,7 @@ public class Network
                 SFAServer.endServer();
                 return;
             }
+        	Thread.currentThread().setName("Network Client Main");
         	Common.log.logMessage("Network started", MyLogger.LogLevel.DEBUG);
         	acceptNewClients();
             while (acceptingNewClients.get())

@@ -67,6 +67,7 @@ public class Network
                 SFAServer.endServer();
                 return;
             }
+        	
         	Common.log.logMessage("Network started", MyLogger.LogLevel.DEBUG);
         	acceptNewClients();
             while (acceptingNewClients.get())
