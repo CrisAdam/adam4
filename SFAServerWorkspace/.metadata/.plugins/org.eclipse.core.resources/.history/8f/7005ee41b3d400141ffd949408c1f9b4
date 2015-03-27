@@ -9,13 +9,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.adam4.common.Common;
 import com.adam4.irc.IRC;
 import com.adam4.irc.ParsedMessage;
 import com.adam4.mylogger.MyLogger;
+import com.mysql.jdbc.PreparedStatement;
 
 public class ClientHandler implements Runnable
 {
@@ -197,45 +197,16 @@ public class ClientHandler implements Runnable
 			<{accountCreationDate: }>);
 
 			 */
-			Connection con = null;
-			java.sql.PreparedStatement prep = null;
 			try 
 			{
-				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, default, ?, default)");
-				prep.setString(1, message.args[0]);
-				prep.setString(1, message.args[1]);
-				prep.setString(1, message.args[2]);
-				ResultSet rs = prep.executeQuery();
-				while (rs.next())
-				{
-					System.out.println(rs.getInt(0));
-				}
+				Connection con = SFAServer.clientDatabasePool.getConnection();
+				con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, ?, ?, ?)");
+				con.
 			} 
 			catch (SQLException e) 
 			{
 				sendError("an error has occured");
 				e.printStackTrace();
-				
-			}
-			finally 
-			{
-				if (prep != null) 
-				{
-					try 
-					{
-						prep.close();
-					} 
-					catch (SQLException e) 
-					{
-						e.printStackTrace();
-					}
-				}
-				if (con != null) 
-				{
-					SFAServer.clientDatabasePool.returnConnection(con);
-				}
-	 
 			}
 		}
 		

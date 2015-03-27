@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.adam4.common.Common;
@@ -202,34 +201,19 @@ public class ClientHandler implements Runnable
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, default, ?, default)");
+				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, ?, ?, ?)");
 				prep.setString(1, message.args[0]);
-				prep.setString(1, message.args[1]);
-				prep.setString(1, message.args[2]);
-				ResultSet rs = prep.executeQuery();
-				while (rs.next())
-				{
-					System.out.println(rs.getInt(0));
-				}
 			} 
 			catch (SQLException e) 
 			{
 				sendError("an error has occured");
 				e.printStackTrace();
-				
 			}
 			finally 
 			{
 				if (prep != null) 
 				{
-					try 
-					{
-						prep.close();
-					} 
-					catch (SQLException e) 
-					{
-						e.printStackTrace();
-					}
+					prep.close();
 				}
 				if (con != null) 
 				{

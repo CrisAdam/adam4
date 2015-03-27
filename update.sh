@@ -2,7 +2,7 @@
 
 gitDir=$HOME/adam4
 activeDir=$gitDir/run
-config=`cat $HOME/config.txt`
+config=`cat $HOME/config.txt | sed "/^-c$/d"`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 compileresult=1 
 

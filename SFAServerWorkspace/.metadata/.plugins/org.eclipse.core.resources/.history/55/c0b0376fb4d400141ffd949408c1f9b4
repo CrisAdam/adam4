@@ -202,10 +202,8 @@ public class ClientHandler implements Runnable
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, default, ?, default)");
+				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, ?, ?, ?)");
 				prep.setString(1, message.args[0]);
-				prep.setString(1, message.args[1]);
-				prep.setString(1, message.args[2]);
 				ResultSet rs = prep.executeQuery();
 				while (rs.next())
 				{
