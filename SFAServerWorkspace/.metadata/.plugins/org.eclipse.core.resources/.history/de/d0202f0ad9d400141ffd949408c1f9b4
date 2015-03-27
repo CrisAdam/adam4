@@ -24,6 +24,7 @@ public class DatabaseConnectionPool
         this.connectionInfo = dbConInfo;
         connections = new LinkedList<>();
         Common.log.logMessage("Creating first DB connection", LogLevel.DEBUG);
+        Class.forName("com.mysql.jdbc.Driver");
         connections.add(createConnection());
         this.maxIdle = maxIdle;
     }
@@ -51,7 +52,7 @@ public class DatabaseConnectionPool
         {
             isConnected = false;
              Common.log.logMessage("Connection pool was unable to create connection to " +
-            		 connectionInfo.url + " " + e.getMessage(), LogLevel.ERROR);
+            		 connectionInfo.url + e.getMessage(), LogLevel.ERROR);
         }
         return con;
     }

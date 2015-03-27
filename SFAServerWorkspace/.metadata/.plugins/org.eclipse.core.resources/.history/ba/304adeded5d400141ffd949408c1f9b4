@@ -48,7 +48,6 @@ public class SFAServer
     	Thread.currentThread().setName("SFAServerMain");
         Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
         Common.log.logMessage("SFA Server starting", LogLevel.DEBUG);
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
         if (!handleCLI(args))
         {
             // do not run program if it is given invalid arguments
@@ -128,7 +127,7 @@ public class SFAServer
             case "-cdb":
             case "-clientdatabase":
             	clientDatabasePool = new DatabaseConnectionPool(new
-                        DatabaseConnectionInfo(args[++i]), maxIdleClientConnections);
+                        DatabaseConnectionInfo(args[++i].split(";")[0], "", ""), maxIdleClientConnections);
                 break;
             case "-r":
             case "-run":

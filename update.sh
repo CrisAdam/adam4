@@ -16,7 +16,7 @@ compile()
 	find $srcDir -type f -name '*test*.java' -delete 
 	find $srcDir -type f -name '*Test*.java' -delete 
 
-	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar -d $HOME/run/ $(find $srcDir -name *.java)
+	/opt/jdk1.8.0_40/bin/javac -cp .:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/mysql-connector-java-5.1.35-bin.jar -d $HOME/run/ $(find $srcDir -name *.java)
 	
 	compileresult=$?
 	if [ $compileresult -eq 0 ]
@@ -66,7 +66,7 @@ waitForShutdown()
 
 run()
 {
-cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/src/mysql-connector-java-5.1.31-bin.jar com.adam4.SFA.SFAServer $config >> console 2>> errors &
+cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/mysql-connector-java-5.1.35-bin.jar com.adam4.SFA.SFAServer $config >> console 2>> errors &
 	startTimer=0
 		while [  $startTimer -lt 10 ]; do
 			echo "waiting up to $startTimer /10 seconds for startup"

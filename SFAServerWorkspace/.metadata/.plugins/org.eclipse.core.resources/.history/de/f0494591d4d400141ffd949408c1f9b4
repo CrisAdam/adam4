@@ -19,7 +19,7 @@ public class DatabaseConnectionPool
     /*
      * creates connections to a single database
      */
-    public DatabaseConnectionPool(DatabaseConnectionInfo dbConInfo, int maxIdle) throws ClassNotFoundException
+    public DatabaseConnectionPool(DatabaseConnectionInfo dbConInfo, int maxIdle)
     {
         this.connectionInfo = dbConInfo;
         connections = new LinkedList<>();
@@ -50,8 +50,9 @@ public class DatabaseConnectionPool
         catch (SQLException e)
         {
             isConnected = false;
-             Common.log.logMessage("Connection pool was unable to create connection to " +
-            		 connectionInfo.url + " " + e.getMessage(), LogLevel.ERROR);
+             Common.log.LogMessage(Thread.currentThread(),
+             "Connection pool was unable to create connection to " +
+            		 connectionInfo.url, LogLevel.INFO, e);
         }
         return con;
     }

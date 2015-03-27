@@ -128,7 +128,7 @@ public class SFAServer
             case "-cdb":
             case "-clientdatabase":
             	clientDatabasePool = new DatabaseConnectionPool(new
-                        DatabaseConnectionInfo(args[++i]), maxIdleClientConnections);
+                        DatabaseConnectionInfo(args[++i].split(";")[0], "", ""), maxIdleClientConnections);
                 break;
             case "-r":
             case "-run":

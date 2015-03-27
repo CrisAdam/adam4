@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.adam4.common.BlockOnRunFile;
@@ -48,7 +47,6 @@ public class SFAServer
     	Thread.currentThread().setName("SFAServerMain");
         Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
         Common.log.logMessage("SFA Server starting", LogLevel.DEBUG);
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
         if (!handleCLI(args))
         {
             // do not run program if it is given invalid arguments
@@ -100,11 +98,6 @@ public class SFAServer
         {
             switch (args[i].toLowerCase())
             {
-            case "-consoleargs":
-            	 Scanner in = new Scanner(System.in);
-            	handleCLI(in.nextLine().split(" "));
-            	in.close();
-                break;
             case "-ltc":
             case "-c":
             case "-console":
@@ -128,7 +121,7 @@ public class SFAServer
             case "-cdb":
             case "-clientdatabase":
             	clientDatabasePool = new DatabaseConnectionPool(new
-                        DatabaseConnectionInfo(args[++i]), maxIdleClientConnections);
+                        DatabaseConnectionInfo(args[++i].split(";")[0], "", ""), maxIdleClientConnections);
                 break;
             case "-r":
             case "-run":

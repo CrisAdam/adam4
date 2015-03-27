@@ -51,7 +51,7 @@ public class DatabaseConnectionPool
         {
             isConnected = false;
              Common.log.logMessage("Connection pool was unable to create connection to " +
-            		 connectionInfo.url + " " + e.getMessage(), LogLevel.ERROR);
+            		 connectionInfo.url + e.getMessage(), LogLevel.ERROR);
         }
         return con;
     }
