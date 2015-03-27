@@ -210,7 +210,11 @@ public class ClientHandler implements Runnable
 				prep.setString(1, message.args[0]);
 				prep.setString(1, message.args[1]);
 				prep.setString(1, message.args[2]);
-				System.out.println(prep.executeUpdate());
+				ResultSet rs = prep.executeUpdate();
+				while (rs.next())
+				{
+					System.out.println(rs.getInt(0));
+				}
 			} 
 			catch (SQLException e) 
 			{
@@ -235,6 +239,7 @@ public class ClientHandler implements Runnable
 				{
 					SFAServer.clientDatabasePool.returnConnection(con);
 				}
+	 
 			}
 		}
 		
