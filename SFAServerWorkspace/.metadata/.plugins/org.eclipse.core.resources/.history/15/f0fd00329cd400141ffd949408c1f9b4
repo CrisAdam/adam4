@@ -272,7 +272,7 @@ public class ClientHandler implements Runnable
         {
             error += '\n';
         }
-        output.write(error + '\n');
+        output.write(error);
         output.flush();
     }
     

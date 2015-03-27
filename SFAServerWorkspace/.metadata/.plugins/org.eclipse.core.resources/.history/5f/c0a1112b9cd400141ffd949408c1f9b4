@@ -272,14 +272,14 @@ public class ClientHandler implements Runnable
         {
             error += '\n';
         }
-        output.write(error + '\n');
+        output.write(error);
         output.flush();
     }
     
     private void sendMessage(ParsedMessage message)
     {
     	System.out.println("Server sent: " + message);
-        output.write(message + "\n");
+        output.write(message + '\n');
         output.flush();
     }
 

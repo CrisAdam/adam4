@@ -21,7 +21,7 @@ compile()
 	compileresult=$?
 	if [ $compileresult -eq 0 ]
 	then
-		echo "successful compile"
+        echo "successful compile"
 	fi
 }
 

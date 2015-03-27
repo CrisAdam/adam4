@@ -95,7 +95,7 @@ public class TestClient
 			}
 			catch (IOException e) 
 			{
-				if (sock.isClosed())
+				if (s.isClosed())
 				{
 					System.out.println("Client socket has been closed, ending reader");
 				}

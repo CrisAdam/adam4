@@ -59,8 +59,13 @@ public class TestClient
             	output.flush();
             	 System.out.println("sent: " + consoleInput);
             }
-            s.close();
             System.out.println("closed");
+            
+            
+            
+
+
+            s.close();
             in.close();
         }
 
@@ -75,18 +80,18 @@ public class TestClient
     static class Writer implements Runnable
     {
     	String str;
-    	Socket sock;
+    	Socket s;
     	BufferedReader input;
     	Writer(Socket s) throws IOException
     	{
-    		sock = s;
+    		this.s = s;
     		input = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8.newDecoder()));
     	}
 
 		@Override
 		public void run() 
 		{
-			System.out.println("TestClient reader running from " + sock.getRemoteSocketAddress());
+			System.out.println("TestClient reader running from " + s.getRemoteSocketAddress());
 			try {
 				while((str = input.readLine()) != null)
 				{
@@ -95,15 +100,8 @@ public class TestClient
 			}
 			catch (IOException e) 
 			{
-				if (sock.isClosed())
-				{
-					System.out.println("Client socket has been closed, ending reader");
-				}
-				else
-				{
-					e.printStackTrace();
-				}
-				
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
     }
