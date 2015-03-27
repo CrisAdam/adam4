@@ -14,6 +14,7 @@ import com.adam4.common.Common;
 import com.adam4.irc.IRC;
 import com.adam4.irc.ParsedMessage;
 import com.adam4.mylogger.MyLogger;
+import com.mysql.jdbc.PreparedStatement;
 
 public class ClientHandler implements Runnable
 {
@@ -151,7 +152,61 @@ public class ClientHandler implements Runnable
 
 	private void register(ParsedMessage message)
 	{
-		//TODO: finish this
+		// REGISTER email@host.domain requestedNick password
+		if (message.args.length < 3)
+		{
+			sendError("not enough parameters recieved, expecting: email, nickname, password");
+		}
+		else if(!Common.isValidEmailString(message.args[0]))
+		{
+			sendError("invalid email syntax: " + message.args[0]);
+		}
+		else if(!Common.isGoodUserName(message.args[1]))
+		{
+			sendError("invalid username: " + message.args[1]);
+		}
+		else if(message.args[2].length() < 3)
+		{
+			sendError("error: password length is too short: " + message.args[2].length() + " needs to be atleast 3 or greater");
+		}
+		else if (SFAServer.clientDatabasePool == null || SFAServer.clientDatabasePool.isConnected())
+		{
+			sendError("unable to accept registrations at this time");
+		}
+		else
+		{
+			//TODO: finish registration, make sql, etc. 
+			/*
+			 * 
+			INSERT INTO `SFASchema`.`UsersTable`
+			(`userID`,
+			`email`,
+			`nickname`,
+			`hashedpassword`,
+			`salt`,
+			`lastSuccessfulLogin`,
+			`accountCreationDate`)
+			VALUES
+			(<{userID: }>,
+			<{email: }>,
+			<{nickname: }>,
+			<{hashedpassword: }>,
+			<{salt: }>,
+			<{lastSuccessfulLogin: }>,
+			<{accountCreationDate: }>);
+
+			 */
+			try 
+			{
+				java.sql.PreparedStatement prepstatement = SFAServer.clientDatabasePool.getConnection().prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, ?, ?, ?)");
+			} 
+			catch (SQLException e) 
+			{
+				sendError("an error has occured");
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	private void user(ParsedMessage message) 
@@ -173,8 +228,7 @@ public class ClientHandler implements Runnable
 			clientID = 1;
 			motd();
 		}
-		/*
-		if (SFAServer.clientDatabasePool.isConnected())
+		if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
 			try 
@@ -187,7 +241,6 @@ public class ClientHandler implements Runnable
 			}
 			
 		}
-		*/
 		SFAServer.connectedClients.add(this);
 		
 		
@@ -211,7 +264,7 @@ public class ClientHandler implements Runnable
 		
 		if (clientID != 0)
 		{
-			sendMessage(new ParsedMessage("MOTD", "Hello"));
+			sendMessage(new ParsedMessage("MOTD", "Welcome to SFAServer!"));
 		}
 		else
 		{
@@ -272,7 +325,7 @@ public class ClientHandler implements Runnable
         {
             error += '\n';
         }
-        output.write(error + '\n');
+        output.write(error);
         output.flush();
     }
     

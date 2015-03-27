@@ -6,10 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import com.adam4.common.BlockOnRunFile;
 import com.adam4.common.Common;
+import com.adam4.dbconnection.DatabaseConnectionInfo;
+import com.adam4.dbconnection.DatabaseConnectionManager;
 import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.mylogger.ConsoleLogWriter;
+import com.adam4.mylogger.DatabaseLogWriter;
 import com.adam4.mylogger.FileLogWriter;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
@@ -24,6 +28,7 @@ public class SFAServer
     public final static Double rootQuadTreeSize = 10000.0;
     public final static Double timeConstant = 0.000000001;
     public final static String version = "1.0.1";
+    private final static int maxIdleClientConnections = 3;
     
 
     // class variables
@@ -100,10 +105,9 @@ public class SFAServer
                 break;
             case "-ldb":
             case "-loggingdatabase":
-                // Common.log.addLogWriter(new DatabaseLogWriter(new
-                // DatabaseConnectionManager(new DatabaseConnectionPool(new
-                // DatabaseConnectionInfo(args[++i].split(";")[0], "", ""),
-                // maxIdleClientConnections)));
+				Common.log.addLogWriter(new DatabaseLogWriter(new DatabaseConnectionPool(new
+                 DatabaseConnectionInfo(args[++i].split(";")[0], "", ""),
+                 1)));
                 break;
             case "-lf":
             case "-loggingfile":
@@ -116,10 +120,8 @@ public class SFAServer
                 break;
             case "-cdb":
             case "-clientdatabase":
-                // clientDataResources.add(new ClientDatabaseResource(new
-                // DatabaseConnectionPool(new
-                // DatabaseConnectionInfo(args[++i].split(";")[0], "", ""),
-                // maxIdleClientConnections)));
+            	clientDatabasePool = new DatabaseConnectionPool(new
+                        DatabaseConnectionInfo(args[++i].split(";")[0], "", ""), maxIdleClientConnections);
                 break;
             case "-r":
             case "-run":

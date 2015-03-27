@@ -1,9 +1,11 @@
 package com.adam4.mylogger;
 
+import java.sql.SQLException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.adam4.common.Common;
 import com.adam4.dbconnection.DatabaseConnectionManager;
+import com.adam4.dbconnection.DatabaseConnectionPool;
 import com.adam4.dbconnection.SQLRequest;
 import com.adam4.mylogger.MyLogger.LogLevel;
 
@@ -13,10 +15,10 @@ public class DatabaseLogWriter implements iLogWriter
     private Writer writer;
     private Thread writerThread;
 
-    public DatabaseLogWriter(DatabaseConnectionManager dbConManager)
+    public DatabaseLogWriter(DatabaseConnectionPool databaseConnectionPool)
     {
         errors = new ConcurrentLinkedQueue<>();
-        writer = new Writer(errors, dbConManager);
+        writer = new Writer(errors, databaseConnectionPool);
         writerThread = new Thread(writer);
         writerThread.start();
     }
@@ -24,12 +26,12 @@ public class DatabaseLogWriter implements iLogWriter
     class Writer implements Runnable
     {
         private boolean done;
-        private DatabaseConnectionManager dbConManager;
+        private DatabaseConnectionPool dbConPool;
 
-        Writer(ConcurrentLinkedQueue<Error> errors, DatabaseConnectionManager dbConManager)
+        Writer(ConcurrentLinkedQueue<Error> errors, DatabaseConnectionPool databaseConnectionPool)
         {
-            this.dbConManager = dbConManager;
-            if (!dbConManager.isOnline())
+            dbConPool = databaseConnectionPool;
+            if (!databaseConnectionPool.isConnected())
             {
                 done = true;
             }
@@ -45,7 +47,8 @@ public class DatabaseLogWriter implements iLogWriter
             req.add(error.message);
             req.add(error.level.toString());
 
-            return dbConManager.writeData(req);
+        //    return dbConPool.getConnection().(req).writeData(req);
+            return true;
         }
 
         @Override
@@ -74,7 +77,11 @@ public class DatabaseLogWriter implements iLogWriter
 
         public void close()
         {
-            dbConManager.close();
+        	try {
+				dbConPool.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
         }
 
     } // end Writer class

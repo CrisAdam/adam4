@@ -77,7 +77,7 @@ public class DatabaseConnectionPool
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+        	Common.log.logMessage("SQL error " + e, LogLevel.ERROR);
         }
     }
 
@@ -94,7 +94,7 @@ public class DatabaseConnectionPool
         }
     }
 
-    void close() throws SQLException
+    public void close() throws SQLException
     {
         for (Connection c : connections)
         {

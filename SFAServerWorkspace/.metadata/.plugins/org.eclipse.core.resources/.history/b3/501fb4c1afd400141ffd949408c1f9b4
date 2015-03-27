@@ -1,0 +1,201 @@
+package com.adam4.SFA;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.adam4.common.BlockOnRunFile;
+import com.adam4.common.Common;
+import com.adam4.dbconnection.DatabaseConnectionInfo;
+import com.adam4.dbconnection.DatabaseConnectionManager;
+import com.adam4.dbconnection.DatabaseConnectionPool;
+import com.adam4.mylogger.ConsoleLogWriter;
+import com.adam4.mylogger.DatabaseLogWriter;
+import com.adam4.mylogger.FileLogWriter;
+import com.adam4.mylogger.MyLogger.LogLevel;
+
+public class SFAServer
+{
+
+    // final variables
+    public final static int clientPort = 9898;
+    public final static int adminPort = 9899;
+    public final static int ENDCHECKFREQUENCY = 1000;
+    public final static int quadCapacity = 4;
+    public final static Double rootQuadTreeSize = 10000.0;
+    public final static Double timeConstant = 0.000000001;
+    public final static String version = "1.0.1";
+    private final static int maxIdleClientConnections = 3;
+    
+
+    // class variables
+    static DatabaseConnectionPool clientDatabasePool;
+
+    // private variables
+    public static ConcurrentLinkedQueue<ClientHandler> connectedClients = new ConcurrentLinkedQueue<ClientHandler>();
+    public static ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<Game>();
+    private static ConcurrentLinkedQueue<ClientHandler> clients = new ConcurrentLinkedQueue<ClientHandler>();
+    private static Network network;
+    public final static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
+    private static BlockOnRunFile block = new BlockOnRunFile(runFilePath);
+
+    public static void main(String[] args) throws Exception
+    {
+    	Thread.currentThread().setName("SFAServerMain");
+        Common.log.setApplication(Thread.currentThread().getStackTrace()[1].getClassName());
+        Common.log.logMessage("SFA Server starting", LogLevel.DEBUG);
+        if (!handleCLI(args))
+        {
+            // do not run program if it is given invalid arguments
+            return;
+        }
+
+        Common.log.logMessage("SFA Server started", LogLevel.DEBUG);
+        
+        network = new Network();
+
+        // the run file is so that the server can (softly) terminate the program
+        // by deleting it
+        
+        block.block();
+        
+        Common.log.logMessage("SFA Server ending", LogLevel.DEBUG);
+        endServer();
+        Common.log.close();
+
+    }
+
+    public void joinGame(ConcurrentLinkedQueue<ClientHandler> playersJoining)
+    {
+        for (Game g : games)
+        {
+            if (!g.getStarted() && (g.getOpenSpots > playersJoining.size()))
+            {
+                clients.removeAll(clients);
+                g.addClients(clients);
+                return;
+            }
+        }
+        // no games with open slots exist, create new game
+        createGame(playersJoining);
+
+    }
+
+    public void createGame(ConcurrentLinkedQueue<ClientHandler> clients)
+    {
+        Game temp = new Game();
+        temp.addClients(clients);
+        clients.removeAll(clients);
+    }
+
+    private static boolean handleCLI(String[] args) throws Exception
+    {
+        // return false and end program if invalid input is provided
+        for (int i = 0; i < args.length; ++i)
+        {
+            switch (args[i].toLowerCase())
+            {
+            case "-ltc":
+            case "-c":
+            case "-console":
+                Common.log.addLogWriter(new ConsoleLogWriter());
+                break;
+            case "-ldb":
+            case "-loggingdatabase":
+                 
+				Common.log.addLogWriter(new DatabaseLogWriter(new
+                 DatabaseConnectionManager(new DatabaseConnectionPool(new
+                 DatabaseConnectionInfo(args[++i].split(";")[0], "", ""),
+                 maxIdleClientConnections)));
+                break;
+            case "-lf":
+            case "-loggingfile":
+                String logFilePath = args[++i];
+                if (!new File(logFilePath).isAbsolute())
+                {
+                    logFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + logFilePath;
+                }
+                Common.log.addLogWriter(new FileLogWriter(logFilePath));
+                break;
+            case "-cdb":
+            case "-clientdatabase":
+                // clientDataResources.add(new ClientDatabaseResource(new
+                // DatabaseConnectionPool(new
+                // DatabaseConnectionInfo(args[++i].split(";")[0], "", ""),
+                // maxIdleClientConnections)));
+                break;
+            case "-r":
+            case "-run":
+                String runFilePath = args[++i];
+                if (!new File(runFilePath).isAbsolute())
+                {
+                    runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + runFilePath;
+                }
+                break;
+            case "-h":
+            case "-help":
+            default:
+                printUsage();
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    private static void printUsage() throws IOException
+    {
+        BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "resources" + FileSystems.getDefault().getSeparator() + "usage.txt"));
+        String line = null;
+        while ((line = br.readLine()) != null)
+        {
+            System.out.println(line);
+        }
+        br.close();
+    }
+
+    static void addPlayer(ClientHandler client)
+    {
+        clients.add(client);
+    }
+
+    static void removePlayer(ClientHandler client)
+    {
+        clients.remove(client);
+    }
+
+    public static void endServer()
+    {
+        network.stopAcceptingNewClients();
+        for (Game g : games)
+        {
+            g.endGame();
+        }
+        for (ClientHandler c : clients)
+        {
+            c.quit("Server is going down");
+        }
+    	try 
+    	{
+			block.end();
+		} 
+    	catch (IOException e) 
+    	{
+    		Common.log.logMessage("Unable to delete run file, terminating", LogLevel.ERROR);
+			for (Thread t : Thread.getAllStackTraces().keySet()) 
+			{  if (t.getState()==Thread.State.RUNNABLE) 
+			     t.interrupt(); 
+			} 
+
+			for (Thread t : Thread.getAllStackTraces().keySet()) 
+			{  if (t.getState()==Thread.State.RUNNABLE) 
+			     t.stop(); 
+			}
+			e.printStackTrace();
+		}
+    }
+
+}
