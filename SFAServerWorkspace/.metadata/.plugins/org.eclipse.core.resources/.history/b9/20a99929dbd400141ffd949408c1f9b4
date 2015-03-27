@@ -174,7 +174,7 @@ public class ClientHandler implements Runnable
 		{
 			sendError("unable to accept registrations at this time");
 		}
-		else if(!SFAServer.clientDatabasePool.isConnected())
+		else if(SFAServer.clientDatabasePool.isConnected())
 		{
 			sendError("unable to process registrations at this time");
 		}

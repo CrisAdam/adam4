@@ -2,9 +2,30 @@
 
 gitDir=$HOME/adam4
 activeDir=$gitDir/run
+config=`cat $HOME/config.txt`
 config=`cat $HOME/config.txt | sed "/^-c$/d"`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 compileresult=1 
+
+run()
+{
+cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/mysql-connector-java-5.1.35-bin.jar com.adam4.SFA.SFAServer $config >> console 2>> errors &
+	startTimer=0
+		while [  $startTimer -lt 10 ]; do
+			echo "waiting up to $startTimer /10 seconds for startup"
+			sleep 1
+			if [ -a $HOME/SFAServer.run ]
+			then
+				startTimer=40
+			fi
+			let startTimer=startTimer+1
+				
+		done
+		if [ $startTimer -eq 10 ]
+		then
+			echo "run file missing, unable to restart `date`" | mail -s `hostname` cristianradam@gmail.com
+		fi
+}
 
 compile()
 {
@@ -64,25 +85,7 @@ waitForShutdown()
 	fi
 }
 
-run()
-{
-cd $HOME && nohup /opt/jdk1.8.0_40/bin/java -cp $HOME/run/:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/javax.mail.jar:/home/ec2-user/adam4/SFAServerWorkspace/SFAServer/lib/mysql-connector-java-5.1.35-bin.jar com.adam4.SFA.SFAServer $config >> console 2>> errors &
-	startTimer=0
-		while [  $startTimer -lt 10 ]; do
-			echo "waiting up to $startTimer /10 seconds for startup"
-			sleep 1
-			if [ -a $HOME/SFAServer.run ]
-			then
-				startTimer=40
-			fi
-			let startTimer=startTimer+1
-				
-		done
-		if [ $startTimer -eq 10 ]
-		then
-			echo "run file missing, unable to restart `date`" | mail -s `hostname` cristianradam@gmail.com
-		fi
-}
+
 
 oldstate=`git log -1 | grep "commit"`
 
