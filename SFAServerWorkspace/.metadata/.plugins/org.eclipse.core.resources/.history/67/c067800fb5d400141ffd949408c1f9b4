@@ -170,13 +170,9 @@ public class ClientHandler implements Runnable
 		{
 			sendError("error: password length is too short: " + message.args[2].length() + " needs to be atleast 3 or greater");
 		}
-		else if (SFAServer.clientDatabasePool == null)
+		else if (SFAServer.clientDatabasePool == null || SFAServer.clientDatabasePool.isConnected())
 		{
 			sendError("unable to accept registrations at this time");
-		}
-		else if(SFAServer.clientDatabasePool.isConnected())
-		{
-			sendError("unable to process registrations at this time");
 		}
 		else
 		{
