@@ -189,6 +189,7 @@ public class ClientHandler implements Runnable
 			`nickname`,
 			`hashedpassword`,
 			`salt`,
+			`lastSuccessfulLogin`,
 			`accountCreationDate`)
 			VALUES
 			(<{userID: }>,
@@ -200,17 +201,15 @@ public class ClientHandler implements Runnable
 			<{accountCreationDate: }>);
 
 			 */
-			
-			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (`userID`,`email`,`nickname`,`hashedpassword`,`salt`,`accountCreationDate`)VALUES\"(default, ?, ?, ?, default, default)";
-					
-			Connection con = null;java.sql.PreparedStatement prep = null;
+			Connection con = null;
+			java.sql.PreparedStatement prep = null;
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement("insert into SFASchema.UsersTable values (default, ?, ?, ?, default, ?, default)");
 				prep.setString(1, message.args[0]);
-				prep.setString(2, message.args[1]);
-				prep.setString(3, message.args[2]);
+				prep.setString(1, message.args[1]);
+				prep.setString(1, message.args[2]);
 				System.out.println(prep.executeUpdate());
 			} 
 			catch (SQLException e) 

@@ -201,7 +201,7 @@ public class ClientHandler implements Runnable
 
 			 */
 			
-			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (`userID`,`email`,`nickname`,`hashedpassword`,`salt`,`accountCreationDate`)VALUES\"(default, ?, ?, ?, default, default)";
+			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (`userID`,`email`,`nickname`,`hashedpassword`,`salt`,`accountCreationDate`)VALUES\"(default, ?, ?, ?, default, ?, default)";
 					
 			Connection con = null;java.sql.PreparedStatement prep = null;
 			try 
@@ -211,6 +211,7 @@ public class ClientHandler implements Runnable
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
 				prep.setString(3, message.args[2]);
+				prep.setString(5, message.args[2]);
 				System.out.println(prep.executeUpdate());
 			} 
 			catch (SQLException e) 
