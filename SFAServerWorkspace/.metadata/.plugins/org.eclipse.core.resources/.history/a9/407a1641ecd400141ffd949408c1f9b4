@@ -259,9 +259,6 @@ public class ClientHandler implements Runnable
 		//	String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
-			
-			// TODO: check that email/user don't already exist
-			
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
@@ -270,16 +267,15 @@ public class ClientHandler implements Runnable
 				prep.setString(2, message.args[1]);
 			//	prep.setString(3, hashedpw);
 				ResultSet rs = prep.executeQuery();
-				if (!rs.first() ) 
+				if (!rs.next() ) 
 				{
 					// unable to login, account not found
 					sendError("Error: invalid login credentials");
 				}
 				else
 				{
-					motd();
 					clientID = rs.getInt(0);
-					
+					motd();
 					// TODO: update last login date to current
 					rs.close();
 				}

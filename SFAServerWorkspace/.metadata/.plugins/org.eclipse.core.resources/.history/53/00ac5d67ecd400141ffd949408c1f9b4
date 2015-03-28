@@ -259,9 +259,6 @@ public class ClientHandler implements Runnable
 		//	String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
-			
-			// TODO: check that email/user don't already exist
-			
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
