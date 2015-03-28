@@ -283,8 +283,8 @@ public class ClientHandler implements Runnable
 	
 	private void user(ParsedMessage message) 
 	{
-		// USER email clientType clientVersion 
-		// USER email clientType clientVersion verification
+		// USER email 
+		// USER email nickname password salt (send to e-mail, used for verification)
 		if (clientID != 0)
 		{
 			sendError("Error: already logged on");

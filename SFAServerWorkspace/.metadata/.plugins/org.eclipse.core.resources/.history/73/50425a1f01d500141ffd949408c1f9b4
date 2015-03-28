@@ -214,6 +214,7 @@ public class ClientHandler implements Runnable
 				prep.setString(4, salt);
 				if (prep.executeUpdate() == 1)
 				{
+						// TODO: create unique hash, send email with hash to verify account
 						try 
 						{
 							String text = "Hello " + message.args[1] + ", \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
@@ -283,8 +284,8 @@ public class ClientHandler implements Runnable
 	
 	private void user(ParsedMessage message) 
 	{
-		// USER email clientType clientVersion 
-		// USER email clientType clientVersion verification
+		// USER email 
+		// USER email nickname password salt (send to e-mail, used for verification)
 		if (clientID != 0)
 		{
 			sendError("Error: already logged on");

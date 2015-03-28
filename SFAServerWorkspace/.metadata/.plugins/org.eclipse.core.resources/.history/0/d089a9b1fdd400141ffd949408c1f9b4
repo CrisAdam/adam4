@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -38,6 +39,7 @@ public class ClientHandler implements Runnable
 										// having the getLine() is nice
 		
 		String unparsedMessage ="";
+		ParsedMessage message = new ParsedMessage("Error", "unsupported message recieved");
 		Common.log.logMessage("client handler created and ran " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
 	
 		try
@@ -214,9 +216,10 @@ public class ClientHandler implements Runnable
 				prep.setString(4, salt);
 				if (prep.executeUpdate() == 1)
 				{
+						// TODO: create unique hash, send email with hash to verify account
 						try 
 						{
-							String text = "Hello " + message.args[1] + ", \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
+							String text = "Hello, \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
 							String[] ex = {"/bin/sh", "-c", 
 								"echo \"" + text + "\" | mail -s \"SFA Registration\" " + message.args[0]};
 
@@ -280,11 +283,10 @@ public class ClientHandler implements Runnable
 		
 	}
 	
-	
 	private void user(ParsedMessage message) 
 	{
-		// USER email clientType clientVersion 
-		// USER email clientType clientVersion verification
+		// USER email 
+		// USER email nickname password salt (send to e-mail, used for verification)
 		if (clientID != 0)
 		{
 			sendError("Error: already logged on");
@@ -304,10 +306,12 @@ public class ClientHandler implements Runnable
 		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
-			String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
+			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
 		//	String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
+			
+			// TODO: check that email/user don't already exist
 			
 			try 
 			{
@@ -330,28 +334,10 @@ public class ClientHandler implements Runnable
 						meta += rs.getMetaData().getColumnName(i) + " " + rs.getMetaData().getColumnType(i) + '\n';
 					}
 					clientID = rs.getInt(1);
-					String salt = rs.getString(2);
-					if (salt.length() < 11)
-					{
-						// need to verify e-mail using verification code
-						if (message.args.length < 4)
-						{
-							sendError("Error, please send verification code");
-							return;
-						}
-						else if (!message.args[3].equals(salt))
-						{
-							sendError("Error, please send correct verification code");
-							return;
-						}
-						String updateSalt = "UPDATE `SFASchema`.`UsersTable` (hashedPassword, salt, lastSuccessfulLogin) VALUES (? ? ?) WHERE (email=\"" + message.args[0] + "\" and nickname=\"" +  message.args[1] + "\")";
-						salt = Common.generateRandomString(24);
-						
-						
-						
-						
-					}
+					Common.log.logMessage(meta, LogLevel.INFO);
+					//clientID = rs.getInt(0);
 					motd();
+					// TODO: update last login date to current
 					rs.close();
 				}
 				
