@@ -279,7 +279,7 @@ public class ClientHandler implements Runnable
 				{
 					motd();
 					String meta = "";
-					for (int i = rs.getMetaData().getColumnCount(); i > 0; --i)
+					for (int i = rs.getMetaData().getColumnCount(); i < 0; --i)
 					{
 						meta += rs.getMetaData().getColumnName(i) + " " + rs.getMetaData().getColumnType(i) + '\n';
 					}
