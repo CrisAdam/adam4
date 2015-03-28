@@ -201,10 +201,9 @@ public class ClientHandler implements Runnable
 
 			 */
 			
-			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (userID, email, nickname, hashedpassword, salt, accountCreationDate)VALUES\"(default, ?, ?, ?, default, default)";
+			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (`userID`,`email`,`nickname`,`hashedpassword`,`salt`,`accountCreationDate`)VALUES\"(default, ?, ?, ?, default, default)";
 					
-			Connection con = null;
-			java.sql.PreparedStatement prep = null;
+			Connection con = null;java.sql.PreparedStatement prep = null;
 			try 
 			{
 				con = SFAServer.clientDatabasePool.getConnection();
