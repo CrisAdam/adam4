@@ -286,9 +286,8 @@ public class ClientHandler implements Runnable
 					clientID = rs.getInt(1);
 					Common.log.logMessage(meta, LogLevel.INFO);
 					//clientID = rs.getInt(0);
-					motd();
 					clientID = 100;
-					motd();
+					
 					// TODO: update last login date to current
 					rs.close();
 				}
