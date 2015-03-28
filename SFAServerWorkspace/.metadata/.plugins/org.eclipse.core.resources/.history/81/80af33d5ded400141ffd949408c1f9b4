@@ -201,7 +201,7 @@ public class ClientHandler implements Runnable
 
 			 */
 			
-			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword) VALUES (?, ?, ?)";
+			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword) VALUES \"(?, ?, ?)\"";
 			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
