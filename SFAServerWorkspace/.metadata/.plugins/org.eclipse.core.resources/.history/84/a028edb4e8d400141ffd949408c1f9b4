@@ -47,10 +47,14 @@ public class Common
         return ':' + s;
     }
     
-    private static SecureRandom random = new SecureRandom();
-    public static String generateRandomString(int length)
+    private SecureRandom random = new SecureRandom();
+    public static generateRandomString(int length)
     {
-    	return new BigInteger(130, random).toString(32).substring(0, Math.min(length,  30));
+    	
+
+    	  public String nextSessionId() {
+    	    return new BigInteger(130, random).toString(32);
+    	  }
     }
 
     public static String removeColons(String s)

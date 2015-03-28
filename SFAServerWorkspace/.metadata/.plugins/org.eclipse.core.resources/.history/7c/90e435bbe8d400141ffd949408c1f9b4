@@ -50,7 +50,9 @@ public class Common
     private static SecureRandom random = new SecureRandom();
     public static String generateRandomString(int length)
     {
-    	return new BigInteger(130, random).toString(32).substring(0, Math.min(length,  30));
+
+    	    return new BigInteger(130, random).toString(32);
+    	  }
     }
 
     public static String removeColons(String s)

@@ -281,7 +281,8 @@ public class ClientHandler implements Runnable
 				}
 				
 
-			} catch (SQLException e) 
+			} 
+			catch (SQLException e) 
 			{
 				sendError("a login error has occured");
 				Common.log.logMessage(e, LogLevel.ERROR);
@@ -305,12 +306,11 @@ public class ClientHandler implements Runnable
 					SFAServer.clientDatabasePool.returnConnection(con);
 				}
 			}
-		}
-		else
-		{
-			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
-			clientID = 1;
-			motd();
+			else
+			{
+				clientID = 1;
+				motd();
+			}
 		}
 		SFAServer.connectedClients.add(this);
 		

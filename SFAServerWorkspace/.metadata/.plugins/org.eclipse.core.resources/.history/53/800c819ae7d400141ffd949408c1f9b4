@@ -154,7 +154,7 @@ public class ClientHandler implements Runnable
 
 	private void register(ParsedMessage message)
 	{
-		// REGISTER email requestedNick password
+		// REGISTER email@host.domain requestedNick password
 		if (message.args.length < 3)
 		{
 			sendError("not enough parameters recieved, expecting: email, nickname, password");
@@ -181,7 +181,7 @@ public class ClientHandler implements Runnable
 		}
 		else
 		{			
-			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword, salt) VALUES (?, ?, ?, ?)";
+			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword) VALUES (?, ?, ?)";
 			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
@@ -192,7 +192,6 @@ public class ClientHandler implements Runnable
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
 				prep.setString(3, hashedpw);
-				prep.setString(4, Common.generateRandomString(10));
 				if (prep.executeUpdate() == 1)
 				{
 					
@@ -238,8 +237,6 @@ public class ClientHandler implements Runnable
 	
 	private void user(ParsedMessage message) 
 	{
-		// USER email nickname password
-		// USER email nickname password salt (send to e-mail, used for verification)
 		if (password == "")
 		{
 			sendError("no password recieved");
@@ -252,11 +249,16 @@ public class ClientHandler implements Runnable
 		{
 			sendError("no user recieved");
 		}
-		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
+		else
+		{
+			clientID = 1;
+			motd();
+		}
+		if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
-			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ?) and (nickname = ?)";
-		//	String hashedpw = Common.hashPassword(password);
+			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where VALUES (?, ?, ?)";
+			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
 			try 
@@ -265,7 +267,7 @@ public class ClientHandler implements Runnable
 				prep = con.prepareStatement(loginCheckSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
-			//	prep.setString(3, hashedpw);
+				prep.setString(3, hashedpw);
 				ResultSet rs = prep.executeQuery();
 				if (!rs.next() ) 
 				{
@@ -275,13 +277,12 @@ public class ClientHandler implements Runnable
 				else
 				{
 					clientID = rs.getInt(0);
-					motd();
-					// TODO: update last login date to current
 					rs.close();
 				}
 				
 
-			} catch (SQLException e) 
+			} 
+			catch (SQLException e) 
 			{
 				sendError("a login error has occured");
 				Common.log.logMessage(e, LogLevel.ERROR);
@@ -305,12 +306,6 @@ public class ClientHandler implements Runnable
 					SFAServer.clientDatabasePool.returnConnection(con);
 				}
 			}
-		}
-		else
-		{
-			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
-			clientID = 1;
-			motd();
 		}
 		SFAServer.connectedClients.add(this);
 		

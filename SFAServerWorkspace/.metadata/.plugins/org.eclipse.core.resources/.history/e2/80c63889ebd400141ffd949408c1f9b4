@@ -252,7 +252,12 @@ public class ClientHandler implements Runnable
 		{
 			sendError("no user recieved");
 		}
-		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
+		else
+		{
+			clientID = 1;
+			motd();
+		}
+		if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
 			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ?) and (nickname = ?)";
@@ -281,7 +286,8 @@ public class ClientHandler implements Runnable
 				}
 				
 
-			} catch (SQLException e) 
+			} 
+			catch (SQLException e) 
 			{
 				sendError("a login error has occured");
 				Common.log.logMessage(e, LogLevel.ERROR);
@@ -305,12 +311,6 @@ public class ClientHandler implements Runnable
 					SFAServer.clientDatabasePool.returnConnection(con);
 				}
 			}
-		}
-		else
-		{
-			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
-			clientID = 1;
-			motd();
 		}
 		SFAServer.connectedClients.add(this);
 		

@@ -308,7 +308,6 @@ public class ClientHandler implements Runnable
 		}
 		else
 		{
-			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
 			clientID = 1;
 			motd();
 		}
