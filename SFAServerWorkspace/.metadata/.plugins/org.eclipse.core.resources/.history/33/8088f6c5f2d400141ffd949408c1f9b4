@@ -255,7 +255,7 @@ public class ClientHandler implements Runnable
 		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
 			// TODO finish login checks
-			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
+			String loginCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ?) and (nickname = ?)";
 		//	String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
