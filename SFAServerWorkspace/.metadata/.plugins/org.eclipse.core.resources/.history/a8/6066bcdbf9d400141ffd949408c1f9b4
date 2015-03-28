@@ -221,7 +221,7 @@ public class ClientHandler implements Runnable
 						{
 							String text = "Hello, \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
 							String ex = "echo '" + text + "' | mail -s \"SFA Registration\" " + message.args[0];
-							Common.log.logMessage("$" + ex + "$", LogLevel.DEBUG);
+							Common.log.logMessage(ex, LogLevel.DEBUG);
 							Process p = Runtime.getRuntime().exec(ex);
 							
 							String email;
