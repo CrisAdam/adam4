@@ -260,11 +260,7 @@ public class ClientHandler implements Runnable
 	{
 		// USER email 
 		// USER email nickname password salt (send to e-mail, used for verification)
-		if (clientID != 0)
-		{
-			sendError("Error: already logged on");
-		}
-		else if (password == "")
+		if (password == "")
 		{
 			sendError("no password recieved");
 		}
@@ -291,7 +287,7 @@ public class ClientHandler implements Runnable
 				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement(loginCheckSQL);
 				prep.setString(1, message.args[0]);
-				prep.setString(2, message.args[1]);
+				prep.setString(2, nick);
 			//	prep.setString(3, hashedpw);
 				ResultSet rs = prep.executeQuery();
 				if (!rs.first() ) 
