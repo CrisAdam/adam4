@@ -349,7 +349,7 @@ public class ClientHandler implements Runnable
 		
 		if (clientID != 0)
 		{
-			sendMessage(new ParsedMessage("MOTD", "Welcome " + clientID + " to SFAServer!"));
+			sendMessage(new ParsedMessage("MOTD", "Welcome to SFAServer!"));
 		}
 		else
 		{
