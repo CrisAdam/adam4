@@ -44,7 +44,7 @@ public class TestClient
             output.write("PASS password \n");
            
          // send nick
-            output.write("NICK starfox \n");
+            output.write("NICK testClient \n");
             
          // send user
             output.write("USER cristian@adam4.com javaTestClient v1.0.0 \n");

@@ -278,22 +278,14 @@ public class ClientHandler implements Runnable
 				else
 				{
 					motd();
-					String meta = "";
-					for (int i = rs.getMetaData().getColumnCount(); i < 0; --i)
-					{
-						meta += rs.getMetaData().getColumnName(i) + " " + rs.getMetaData().getColumnType(i) + '\n';
-					}
-					Common.log.logMessage(meta, LogLevel.INFO);
-					//clientID = rs.getInt(0);
-					clientID = 100;
+					clientID = rs.getInt(0);
 					
 					// TODO: update last login date to current
 					rs.close();
 				}
 				
 
-			} 
-			catch (SQLException e) 
+			} catch (SQLException e) 
 			{
 				sendError("a login error has occured");
 				Common.log.logMessage(e, LogLevel.ERROR);
