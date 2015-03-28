@@ -198,7 +198,7 @@ public class ClientHandler implements Runnable
 				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement(usernameCheckSQL);
 				prep.setString(1, message.args[0]);
-				prep.setString(2, message.args[1]);
+				prep.setString(2, nick);
 				ResultSet rs = prep.executeQuery();
 				if (rs.first()) 
 				{
@@ -318,7 +318,7 @@ public class ClientHandler implements Runnable
 				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement(loginCheckSQL);
 				prep.setString(1, message.args[0]);
-				prep.setString(2, nick);
+				prep.setString(2, message.args[1]);
 			//	prep.setString(3, hashedpw);
 				ResultSet rs = prep.executeQuery();
 				if (!rs.first() ) 
