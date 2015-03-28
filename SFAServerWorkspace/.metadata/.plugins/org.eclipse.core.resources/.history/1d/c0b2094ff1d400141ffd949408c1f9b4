@@ -108,9 +108,6 @@ public class Common
     public static String hashPassword(String password)
     {
     	if (password.length() < 2)
-    	{
-    		return "hash failure";
-    	}
         String output = "hash failure";
         MessageDigest digest;
         try

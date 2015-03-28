@@ -41,13 +41,13 @@ public class TestClient
             
             
          // send password
-       //     output.write("PASS password \n");
+            output.write("PASS password \n");
            
          // send nick
-      //      output.write("NICK starfox \n");
+            output.write("NICK starfox \n");
             
          // send user
-     //       output.write("USER cristian@adam4.com javaTestClient v1.0.0 \n");
+            output.write("USER cristian@adam4.com javaTestClient v1.0.0 \n");
             
             output.flush();
             String consoleInput = "0";
