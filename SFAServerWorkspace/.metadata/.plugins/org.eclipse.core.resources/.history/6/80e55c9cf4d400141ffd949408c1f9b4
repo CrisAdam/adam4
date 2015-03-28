@@ -201,7 +201,6 @@ public class ClientHandler implements Runnable
 					sendError("Error: username or nick is unavailable");
 					return;
 				}
-				prep.close();
 				
 				prep = con.prepareStatement(insertSQL);
 				prep.setString(1, message.args[0]);

@@ -181,7 +181,7 @@ public class ClientHandler implements Runnable
 		}
 		else
 		{	
-			String usernameCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
+			String usernameCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
 			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword, salt) VALUES (?, ?, ?, ?)";
 			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
@@ -191,18 +191,19 @@ public class ClientHandler implements Runnable
 				// check for username/nickname already in use
 				
 				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement(usernameCheckSQL);
+				prep = con.prepareStatement(loginCheckSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, nick);
+			//	prep.setString(3, hashedpw);
 				ResultSet rs = prep.executeQuery();
-				if (rs.first()) 
+				if (!rs.first() ) 
 				{
-					// username/nick is taken available
-					sendError("Error: username or nick is unavailable");
-					return;
+					// unable to login, account not found
+					sendError("Error: invalid login credentials");
 				}
-				prep.close();
 				
+				// now that username isn't in use, attmept to create
+				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement(insertSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);

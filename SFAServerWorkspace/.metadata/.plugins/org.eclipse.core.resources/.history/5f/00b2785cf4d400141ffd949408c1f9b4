@@ -198,11 +198,11 @@ public class ClientHandler implements Runnable
 				if (rs.first()) 
 				{
 					// username/nick is taken available
-					sendError("Error: username or nick is unavailable");
 					return;
 				}
-				prep.close();
 				
+				// now that username isn't in use, attmept to create
+				con = SFAServer.clientDatabasePool.getConnection();
 				prep = con.prepareStatement(insertSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);

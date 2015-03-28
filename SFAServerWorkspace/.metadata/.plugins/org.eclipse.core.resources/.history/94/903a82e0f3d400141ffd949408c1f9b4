@@ -180,29 +180,14 @@ public class ClientHandler implements Runnable
 			sendError("unable to process registrations at this time");
 		}
 		else
-		{	
-			String usernameCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
+		{			
 			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword, salt) VALUES (?, ?, ?, ?)";
 			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
 			try 
 			{
-				// check for username/nickname already in use
-				
 				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement(usernameCheckSQL);
-				prep.setString(1, message.args[0]);
-				prep.setString(2, nick);
-				ResultSet rs = prep.executeQuery();
-				if (rs.first()) 
-				{
-					// username/nick is taken available
-					sendError("Error: username or nick is unavailable");
-					return;
-				}
-				prep.close();
-				
 				prep = con.prepareStatement(insertSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
@@ -292,6 +277,7 @@ public class ClientHandler implements Runnable
 				}
 				else
 				{
+					motd();
 					String meta = "";
 					for (int i = rs.getMetaData().getColumnCount(); i > 0; --i)
 					{
@@ -300,6 +286,8 @@ public class ClientHandler implements Runnable
 					clientID = rs.getInt(1);
 					Common.log.logMessage(meta, LogLevel.INFO);
 					//clientID = rs.getInt(0);
+					motd();
+					clientID = 9001;
 					motd();
 					// TODO: update last login date to current
 					rs.close();
