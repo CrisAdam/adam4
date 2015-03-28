@@ -219,9 +219,9 @@ public class ClientHandler implements Runnable
 						// TODO: create unique hash, send email with hash to verify account
 						try 
 						{
-							String text = "Hello, \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
+							String text = "Hello, \n Thank you for registering with SFA \n To continue";
 							
-							Runtime.getRuntime().exec("echo '" + text + "' | mail -s \"SFA Registration\" " + message.args[0]);
+							Runtime.getRuntime().exec("ls");
 						}
 						catch (IOException e) 
 						{

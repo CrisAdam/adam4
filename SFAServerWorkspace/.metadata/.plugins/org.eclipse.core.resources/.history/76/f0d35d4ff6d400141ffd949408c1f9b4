@@ -212,25 +212,24 @@ public class ClientHandler implements Runnable
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
 				prep.setString(3, hashedpw);
-				String salt = Common.generateRandomString(10);
-				prep.setString(4, salt);
+				prep.setString(4, Common.generateRandomString(10));
 				if (prep.executeUpdate() == 1)
 				{
-						// TODO: create unique hash, send email with hash to verify account
-						try 
-						{
-							String text = "Hello, \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
-							
-							Runtime.getRuntime().exec("echo '" + text + "' | mail -s \"SFA Registration\" " + message.args[0]);
-						}
-						catch (IOException e) 
-						{
-							Common.log.logMessage(e, LogLevel.ERROR);
-						}
+					
 				}
 				else
 				{
-					sendError("an account validation error has occured");
+					sendError("account validation error has occured");
+				}
+				try 
+				{
+					// TODO: create unique hash, send email with hash to verify account
+					Runtime.getRuntime().exec("ls");
+				} 
+				catch (IOException e) 
+				{
+					sendError("account created, however a validation error has occured");
+					Common.log.logMessage(e, LogLevel.ERROR);
 				}
 			} 
 			catch (SQLException e) 
