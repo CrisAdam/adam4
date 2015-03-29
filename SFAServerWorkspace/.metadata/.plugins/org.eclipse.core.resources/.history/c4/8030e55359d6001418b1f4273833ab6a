@@ -404,7 +404,7 @@ public class ClientHandler implements Runnable
 							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
 							prep.setString(2,  salt);
 							prep.setTimestamp(3, Common.getTime());
-							System.out.println(updateSQL + "   " + salt + "     " + Common.hashPassword(password + salt + SFAServer.getPepper()));
+							System.out.println(updateSQL + "   " );
 							if (prep.executeUpdate() != 1)
 							{
 								sendError("Error: unable to validate");

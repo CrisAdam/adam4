@@ -396,7 +396,7 @@ public class ClientHandler implements Runnable
 						if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
 						{
 							clientID = rs.getInt(1);
-							salt = Common.generateRandomString(20);
+							salt = Common.generateRandomString(15);
 							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 							rs.close();
 							prep.close();
@@ -404,7 +404,6 @@ public class ClientHandler implements Runnable
 							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
 							prep.setString(2,  salt);
 							prep.setTimestamp(3, Common.getTime());
-							System.out.println(updateSQL + "   " + salt + "     " + Common.hashPassword(password + salt + SFAServer.getPepper()));
 							if (prep.executeUpdate() != 1)
 							{
 								sendError("Error: unable to validate");
