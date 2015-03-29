@@ -396,7 +396,7 @@ public class ClientHandler implements Runnable
 						if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
 						{
 							clientID = rs.getInt(1);
-							salt = Common.generateRandomString(15);
+							salt = Common.generateRandomString(20);
 							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 							rs.close();
 							prep.close();
