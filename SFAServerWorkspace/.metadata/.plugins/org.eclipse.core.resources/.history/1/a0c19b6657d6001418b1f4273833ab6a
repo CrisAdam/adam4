@@ -397,7 +397,7 @@ public class ClientHandler implements Runnable
 						{
 							clientID = rs.getInt(1);
 							salt = Common.generateRandomString(20);
-							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?)  WHERE (userID =\"" + nick + "\" and email=\"" + message.args[0] + "\")";
+							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE (nickname =\"" + nick + "\" and email=\"" + message.args[0] + "\")";
 							rs.close();
 							prep.close();
 							prep = con.prepareStatement(updateSQL);
