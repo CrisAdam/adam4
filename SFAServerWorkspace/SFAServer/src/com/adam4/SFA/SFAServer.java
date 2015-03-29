@@ -42,6 +42,7 @@ public class SFAServer
     private static Network network;
     public final static String runFilePath = System.getProperty("user.dir") + FileSystems.getDefault().getSeparator() + "SFAServer.run";
     private static BlockOnRunFile block = new BlockOnRunFile(runFilePath);
+	public static String pepper = "pepper";
 
     public static void main(String[] args) throws Exception
     {
@@ -130,6 +131,10 @@ public class SFAServer
             	clientDatabasePool = new DatabaseConnectionPool(new
                         DatabaseConnectionInfo(args[++i]), maxIdleClientConnections);
                 break;
+            case "-p":
+            case "-pepper":
+            	pepper = args[++i];
+            	break;
             case "-r":
             case "-run":
                 String runFilePath = args[++i];

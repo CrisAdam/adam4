@@ -44,11 +44,12 @@ public class TestClient
             output.write("PASS password \n");
            
          // send nick
-            output.write("NICK starfox \n");
+            output.write("NICK starlord \n");
             
          // send user
             output.write("USER cristian@adam4.com javaTestClient v1.0.0 \n");
             
+            //REGISTER cristian@adam4.com starlord mypassword
             output.flush();
             String consoleInput = "0";
             System.out.println("enter quit to exit");

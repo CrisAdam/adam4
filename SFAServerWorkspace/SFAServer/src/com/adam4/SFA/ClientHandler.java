@@ -51,32 +51,28 @@ public class ClientHandler implements Runnable
 		{
 			Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 		}
-	//	while (!clientSocket.isClosed())
+		SFAServer.connectedClients.add(this);
+		try
+		{
+			while((unparsedMessage = input.readLine()) != null)
+			{
+				System.out.println("ClientHandler Recieved: " + unparsedMessage);
+				handleMessage(IRC.parseLine(unparsedMessage));
+			}
+		}
+		catch (IOException e)
 		{
 			try
 			{
-				while((unparsedMessage = input.readLine()) != null)
-				{
-					System.out.println("ClientHandler Recieved: " + unparsedMessage);
-					handleMessage(IRC.parseLine(unparsedMessage));
-				}
+				clientSocket.close();
 			}
-			catch (IOException e)
+			catch (IOException e1)
 			{
-				try
-				{
-					clientSocket.close();
-				}
-				catch (IOException e1)
-				{
-					e1.printStackTrace();
-				}
-				Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
+				e1.printStackTrace();
 			}
-			
-			
-			
+			Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 		}
+			
 		Common.log.logMessage("client handler closing: " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
 	}
 
@@ -104,12 +100,13 @@ public class ClientHandler implements Runnable
 			}
 			case "PASS": 
 			{
-				password = message.args[0];
+				password(message);
 				break;
 			}
 			case "NICK": // set nickname
 			{
-				nick = message.args[0];
+				
+				nick(message);
 				break;
 			}
 			case "USER": // connect
@@ -117,9 +114,9 @@ public class ClientHandler implements Runnable
 				user(message);
 				break;
 			}
-			case "READY":
+			case "LOBBY":
 			{
-				ready(message);
+				lobby(message);
 				break;
 			}
 			case "MOTD":
@@ -144,6 +141,33 @@ public class ClientHandler implements Runnable
 	}
 
 
+	private void nick(ParsedMessage message) 
+	{
+		if (clientID == 0)
+		{
+			nick = message.args[0];
+		}
+		else
+		{
+			sendError("Already logged in");
+		}
+		
+	}
+
+	private void password(ParsedMessage message) 
+	{
+		if (clientID == 0)
+		{
+			password = message.args[0];
+		}
+		else
+		{
+			sendError("Already logged in");
+		}
+		
+		
+	}
+
 	private void ping(ParsedMessage message) 
 	{
 		sendMessage(new ParsedMessage("PONG", message.args,message.trailing));
@@ -151,7 +175,6 @@ public class ClientHandler implements Runnable
 
 	private void pong(ParsedMessage message) 
 	{
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -280,7 +303,6 @@ public class ClientHandler implements Runnable
 		
 	}
 	
-	
 	private void user(ParsedMessage message) 
 	{
 		// USER email clientType clientVersion 
@@ -303,97 +325,110 @@ public class ClientHandler implements Runnable
 		}
 		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
-			// TODO finish login checks
-			String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
-		//	String hashedpw = Common.hashPassword(password);
-			Connection con = null;
-			java.sql.PreparedStatement prep = null;
 			
-			try 
-			{
-				con = SFAServer.clientDatabasePool.getConnection();
-				prep = con.prepareStatement(loginCheckSQL);
-				prep.setString(1, message.args[0]);
-				prep.setString(2, nick);
-			//	prep.setString(3, hashedpw);
-				ResultSet rs = prep.executeQuery();
-				if (!rs.first() ) 
+				if (message.args.length == 3)
 				{
-					// unable to login, account not found
-					sendError("Error: invalid login credentials");
+					// verification not sent, client should be verified
+				}
+				else if (message.args.length == 4)
+				{
+					Connection con = null;
+					java.sql.PreparedStatement prep = null;
+					try 
+					{
+					// verify against email
+					String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
+					
+					con = SFAServer.clientDatabasePool.getConnection();
+					prep = con.prepareStatement(loginCheckSQL);
+					prep.setString(1, message.args[0]);
+					prep.setString(2, nick);
+					ResultSet rs = prep.executeQuery();
+					if (!rs.first() ) 
+					{
+						// unable to login, account not found
+						sendError("Error: invalid login credentials");
+					}
+					else
+					{
+						int tempclientID = rs.getInt(1); 		// don't assign it yet, wait until after password check
+						String salt = rs.getString(2);
+						if (salt.length() < 11)
+						{
+							// need to verify e-mail against verification code
+							if (message.args.length < 4)
+							{
+								sendError("Error, please send verification code");
+								return;
+							}
+							else if (!message.args[3].equals(salt))
+							{
+								sendError("Error, please send correct verification code");
+								return;
+							}
+							String updateSaltSQL = "UPDATE `SFASchema`.`UsersTable` (hashedPassword, salt, lastSuccessfulLogin) VALUES (? ? ?) WHERE (email=\"" + message.args[0] + "\" and nickname=\"" +  message.args[1] + "\")";
+							salt = Common.generateRandomString(24);
+							rs.close();
+							prep.close();
+							prep = con.prepareStatement(updateSaltSQL);
+							
+							
+							
+							
+						}
+						else
+						{
+							// user has already verified
+							String hashed = Common.hashPassword(password + salt + SFAServer.pepper);
+							String passwordCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
+						}
+						motd();
+						rs.close();
+					}
+				} 
+				catch (SQLException e) 
+				{
+					sendError("a login error has occured");
+					Common.log.logMessage(e, LogLevel.ERROR);
+					
+				}
+				finally 
+				{
+					if (prep != null) 
+					{
+						try 
+						{
+							prep.close();
+						} 
+						catch (SQLException e) 
+						{
+							Common.log.logMessage(e, LogLevel.ERROR);
+						}
+					}
+					if (con != null) 
+					{
+						SFAServer.clientDatabasePool.returnConnection(con);
+					}
+				}
+				
 				}
 				else
 				{
-					String meta = "";
-					for (int i = rs.getMetaData().getColumnCount(); i > 0; --i)
-					{
-						meta += rs.getMetaData().getColumnName(i) + " " + rs.getMetaData().getColumnType(i) + '\n';
-					}
-					clientID = rs.getInt(1);
-					String salt = rs.getString(2);
-					if (salt.length() < 11)
-					{
-						// need to verify e-mail using verification code
-						if (message.args.length < 4)
-						{
-							sendError("Error, please send verification code");
-							return;
-						}
-						else if (!message.args[3].equals(salt))
-						{
-							sendError("Error, please send correct verification code");
-							return;
-						}
-						String updateSalt = "UPDATE `SFASchema`.`UsersTable` (hashedPassword, salt, lastSuccessfulLogin) VALUES (? ? ?) WHERE (email=\"" + message.args[0] + "\" and nickname=\"" +  message.args[1] + "\")";
-						salt = Common.generateRandomString(24);
-						
-						
-						
-						
-					}
-					motd();
-					rs.close();
+					;
 				}
 				
-
-			} 
-			catch (SQLException e) 
-			{
-				sendError("a login error has occured");
-				Common.log.logMessage(e, LogLevel.ERROR);
-				
-			}
-			finally 
-			{
-				if (prep != null) 
-				{
-					try 
-					{
-						prep.close();
-					} 
-					catch (SQLException e) 
-					{
-						Common.log.logMessage(e, LogLevel.ERROR);
-					}
-				}
-				if (con != null) 
-				{
-					SFAServer.clientDatabasePool.returnConnection(con);
-				}
-			}
 		}
-		else
+		else // database connection is down
 		{
 			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
-			clientID = 1;
-			motd();
+		//	clientID = 1;
+		//	motd();
 		}
-		SFAServer.connectedClients.add(this);
 		
 		
 	}
 	
-	private void ready(ParsedMessage message) 
+	private void lobby(ParsedMessage message) 
 	{
 		if (currentGame == 0)
 		{
