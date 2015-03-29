@@ -209,7 +209,6 @@ public class ClientHandler implements Runnable
 		{	
 			String usernameCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
 			String insertSQL = "INSERT INTO `SFASchema`.`UsersTable` (email, nickname, hashedpassword, salt) VALUES (?, ?, ?, ?)";
-			String hashedpw = Common.hashPassword(password);
 			Connection con = null;
 			java.sql.PreparedStatement prep = null;
 			try 
@@ -228,12 +227,12 @@ public class ClientHandler implements Runnable
 					return;
 				}
 				prep.close();
-				
+				String salt = Common.generateRandomString(10);
+				String hashedpw = Common.hashPassword(password + salt + SFAServer.getPepper());
 				prep = con.prepareStatement(insertSQL);
 				prep.setString(1, message.args[0]);
 				prep.setString(2, message.args[1]);
 				prep.setString(3, hashedpw);
-				String salt = Common.generateRandomString(10);
 				prep.setString(4, salt);
 				if (prep.executeUpdate() == 1)
 				{
@@ -325,75 +324,124 @@ public class ClientHandler implements Runnable
 		}
 		else if (SFAServer.clientDatabasePool != null && SFAServer.clientDatabasePool.isConnected())
 		{
-			
-				if (message.args.length == 3)
+
+			if (message.args.length == 3 || message.args.length == 4 )
+			{
+				Connection con = null;
+				ResultSet rs = null;
+				java.sql.PreparedStatement prep = null;
+				
+				try
 				{
-					// verification not sent, client should be verified
-				}
-				else if (message.args.length == 4)
-				{
-					Connection con = null;
-					java.sql.PreparedStatement prep = null;
-					try 
-					{
-					// verify against email
-					String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? and nickname = ?)";
-					
 					con = SFAServer.clientDatabasePool.getConnection();
+					
+					String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`hashedpassword`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
 					prep = con.prepareStatement(loginCheckSQL);
 					prep.setString(1, message.args[0]);
 					prep.setString(2, nick);
-					ResultSet rs = prep.executeQuery();
-					if (!rs.first() ) 
+					rs = prep.executeQuery();
+					if (!rs.first()) 
 					{
-						// unable to login, account not found
-						sendError("Error: invalid login credentials");
+						sendError("Error: unable to find account");
+						return;
 					}
-					else
+					String DBhashedPassword = rs.getString(2);
+					String salt = rs.getString(3);
+					if (message.args.length == 3)
 					{
-						int tempclientID = rs.getInt(1); 		// don't assign it yet, wait until after password check
-						String salt = rs.getString(2);
-						if (salt.length() < 11)
+
+						// BEGIN NORMAL USER LOGIN
+						
+						if (salt.length() > 12)  // check that user has validated
 						{
-							// need to verify e-mail against verification code
-							if (message.args.length < 4)
+							if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
 							{
-								sendError("Error, please send verification code");
-								return;
+								clientID = rs.getInt(1);
+								motd();
+								// Successful login, given password matches expected password
+								
+								String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (lastSuccessfulLogin) VALUES (?) WHERE (userID =\"" + nick + "\" and email=\"" + message.args[0] + "\")";
+								prep.close();
+								prep = con.prepareStatement(updateSQL);
+								prep.setTimestamp(1, Common.getTime());
+								if (prep.executeUpdate() != 1)
+								{
+									Common.log.logMessage("unable to update last login date: " + message.args[0] + " " + nick, LogLevel.ERROR);
+								}
 							}
-							else if (!message.args[3].equals(salt))
+							else
 							{
-								sendError("Error, please send correct verification code");
-								return;
+								sendError("Error: unsuccessful login attempt");
+								// TODO: log unsuccessful login attempt, restrict retries
 							}
-							String updateSaltSQL = "UPDATE `SFASchema`.`UsersTable` (hashedPassword, salt, lastSuccessfulLogin) VALUES (? ? ?) WHERE (email=\"" + message.args[0] + "\" and nickname=\"" +  message.args[1] + "\")";
-							salt = Common.generateRandomString(24);
-							rs.close();
-							prep.close();
-							prep = con.prepareStatement(updateSaltSQL);
-							
-							
-							
-							
 						}
 						else
 						{
-							// user has already verified
-							String hashed = Common.hashPassword(password + salt + SFAServer.pepper);
-							String passwordCheckSQL = "SELECT `UsersTable`.`userID` FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
+							sendError("Error: account needs to be validated first");
 						}
-						motd();
-						rs.close();
+						
 					}
-				} 
+					else
+					{
+						// BEGIN VALIDATE USER
+						if (salt.length() > 12)
+						{
+							sendError("Error: account has already been validated");
+							return;
+						}
+						if (!salt.equals(message.args[3]))
+						{
+							sendError("Error: invalid verifier");
+							return;
+							// TODO: prevent repeated guesses at verifier
+						}
+						if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
+						{
+							clientID = rs.getInt(1);
+							salt = Common.generateRandomString(20);
+							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE (userID =\"" + nick + "\" and email=\"" + message.args[0] + "\")";
+							rs.close();
+							prep.close();
+							prep = con.prepareStatement(updateSQL);
+							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
+							prep.setString(2,  salt);
+							prep.setTimestamp(3, Common.getTime());
+							if (prep.executeUpdate() != 1)
+							{
+								sendError("Error: unable to validate");
+								Common.log.logMessage("Validate user error: " + message.args[0] + " " + nick, LogLevel.ERROR);
+							}
+							else
+							{
+								motd();
+							}
+						}
+						else
+						{
+							sendError("Error: unsuccessful login attempt");
+							// TODO: log unsuccessful login attempt, restrict retries
+						}
+
+					}
+				}
 				catch (SQLException e) 
 				{
 					sendError("a login error has occured");
 					Common.log.logMessage(e, LogLevel.ERROR);
-					
 				}
-				finally 
+				finally // this should get called even if the try reaches a "return"
 				{
+					if (rs != null)
+					{
+						try 
+						{
+							rs.close();
+						} 
+						catch (SQLException e) 
+						{
+							Common.log.logMessage(e, LogLevel.ERROR);
+						}
+					}
 					if (prep != null) 
 					{
 						try 
@@ -409,20 +457,16 @@ public class ClientHandler implements Runnable
 					{
 						SFAServer.clientDatabasePool.returnConnection(con);
 					}
-				}
-				
-				}
-				else
-				{
-					;
-				}
-				
+				}					
+			}
+			else
+			{
+				sendError("Error: invalid number of arguments");
+			}	
 		}
 		else // database connection is down
 		{
 			Common.log.logMessage("unable to validate login", LogLevel.ERROR);
-		//	clientID = 1;
-		//	motd();
 		}
 		
 		
