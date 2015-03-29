@@ -399,7 +399,7 @@ public class ClientHandler implements Runnable
 							motd();
 							salt = Common.generateRandomString(20);
 							//String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
-							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (lastSuccessfulLogin) VALUES (?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
+							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (lastSuccessfulLogin) VALUES (?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 							rs.close();
 							prep.close();
 							prep = con.prepareStatement(updateSQL);
