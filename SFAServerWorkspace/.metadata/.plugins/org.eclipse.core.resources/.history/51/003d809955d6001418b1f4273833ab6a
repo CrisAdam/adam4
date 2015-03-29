@@ -335,8 +335,10 @@ public class ClientHandler implements Runnable
 				{
 					con = SFAServer.clientDatabasePool.getConnection();
 					
-					String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`hashedpassword`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` (userID =\"" + nick + "\" OR email=\"" + message.args[0] + "\")";
+					String loginCheckSQL = "SELECT (`UsersTable`.`userID`, `UsersTable`.`hashedpassword`, `UsersTable`.`salt`) FROM `SFASchema`.`UsersTable` where (email  = ? or nickname = ?)";
 					prep = con.prepareStatement(loginCheckSQL);
+					prep.setString(1, message.args[0]);
+					prep.setString(2, nick);
 					rs = prep.executeQuery();
 					if (!rs.first()) 
 					{
