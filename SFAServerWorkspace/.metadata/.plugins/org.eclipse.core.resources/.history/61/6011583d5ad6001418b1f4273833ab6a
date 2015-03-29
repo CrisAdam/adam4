@@ -396,7 +396,6 @@ public class ClientHandler implements Runnable
 						if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
 						{
 							clientID = rs.getInt(1);
-							motd();
 							salt = Common.generateRandomString(20);
 							//String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt) VALUES (?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
@@ -411,6 +410,10 @@ public class ClientHandler implements Runnable
 							{
 								sendError("Error: unable to validate");
 								Common.log.logMessage("Validate user error: " + message.args[0] + " " + nick, LogLevel.ERROR);
+							}
+							else
+							{
+								motd();
 							}
 						}
 						else

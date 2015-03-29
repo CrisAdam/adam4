@@ -396,21 +396,23 @@ public class ClientHandler implements Runnable
 						if (java.security.MessageDigest.isEqual(Common.hashPassword(password + salt + SFAServer.getPepper()).getBytes(), DBhashedPassword.getBytes()))
 						{
 							clientID = rs.getInt(1);
-							motd();
 							salt = Common.generateRandomString(20);
-							//String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
-							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt) VALUES (?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
+							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (hashedpassword, salt, lastSuccessfulLogin) VALUES (?, ?, ?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 							rs.close();
 							prep.close();
 							prep = con.prepareStatement(updateSQL);
 							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
 							prep.setString(2,  salt);
-							//prep.setTimestamp(3, Common.getTime());
+							prep.setTimestamp(3, Common.getTime());
 							System.out.println(updateSQL + "   " + salt + "     " + Common.hashPassword(password + salt + SFAServer.getPepper()));
 							if (prep.executeUpdate() != 1)
 							{
 								sendError("Error: unable to validate");
 								Common.log.logMessage("Validate user error: " + message.args[0] + " " + nick, LogLevel.ERROR);
+							}
+							else
+							{
+								motd();
 							}
 						}
 						else

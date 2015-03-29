@@ -412,6 +412,10 @@ public class ClientHandler implements Runnable
 								sendError("Error: unable to validate");
 								Common.log.logMessage("Validate user error: " + message.args[0] + " " + nick, LogLevel.ERROR);
 							}
+							else
+							{
+								motd();
+							}
 						}
 						else
 						{
