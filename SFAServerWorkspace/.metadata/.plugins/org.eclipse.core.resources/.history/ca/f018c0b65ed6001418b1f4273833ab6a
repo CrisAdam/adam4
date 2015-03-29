@@ -358,9 +358,10 @@ public class ClientHandler implements Runnable
 								motd();
 								// Successful login, given password matches expected password
 								
-								String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET lastSuccessfulLogin=\"" + Common.getTime() +  "\" WHERE userID=\"" + clientID + "\"";
+								String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET (lastSuccessfulLogin) VALUES (?) WHERE nickname=\"" + nick + "\" AND email=\"" + message.args[0] + "\"";
 								prep.close();
 								prep = con.prepareStatement(updateSQL);
+								prep.setTimestamp(1, Common.getTime());
 								if (prep.executeUpdate() != 1)
 								{
 									Common.log.logMessage("unable to update last login date: " + message.args[0] + " " + nick, LogLevel.ERROR);
