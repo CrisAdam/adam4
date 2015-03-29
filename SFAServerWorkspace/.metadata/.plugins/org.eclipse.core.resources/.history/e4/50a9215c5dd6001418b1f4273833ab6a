@@ -398,10 +398,13 @@ public class ClientHandler implements Runnable
 							clientID = rs.getInt(1);
 							motd();
 							salt = Common.generateRandomString(20);
-							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET hashedpassword=\"" + Common.hashPassword(password + salt + SFAServer.getPepper()) + ", salt=\"" + salt + "\", lastSuccessfulLogin=\"" + Common.getTime() +  "\" WHERE userID=\"" + clientID + "\"";
+							String updateSQL = "UPDATE `SFASchema`.`UsersTable` SET hashedpassword=\"" + ", salt=\"" + "\", lastSuccessfulLogin=\"" +  "\" WHERE userID=\"" + clientID + "\"";
 							rs.close();
 							prep.close();
 							prep = con.prepareStatement(updateSQL);
+							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
+							prep.setString(2,  salt);
+							prep.setTimestamp(3, Common.getTime());
 							System.out.println(updateSQL + "   " + salt + "     " + Common.hashPassword(password + salt + SFAServer.getPepper()));
 							if (prep.executeUpdate() != 1)
 							{
