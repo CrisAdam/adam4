@@ -41,7 +41,7 @@ public class TestClient
             
             
          // send password
-            output.write("PASS mypass \n");
+            output.write("PASS password \n");
            
          // send nick
             output.write("NICK starlord \n");
