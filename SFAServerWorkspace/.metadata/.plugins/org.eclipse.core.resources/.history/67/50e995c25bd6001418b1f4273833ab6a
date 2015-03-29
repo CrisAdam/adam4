@@ -403,11 +403,9 @@ public class ClientHandler implements Runnable
 							rs.close();
 							prep.close();
 							prep = con.prepareStatement(updateSQL);
-							prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
-							prep.setString(2,  salt);
-							prep.setTimestamp(3, Common.getTime());
-							prep.setString(4,  nick);
-							prep.setString(5,  message.args[0]);
+							//prep.setString(1, Common.hashPassword(password + salt + SFAServer.getPepper()));
+							//prep.setString(1,  salt);
+							prep.setTimestamp(1, Common.getTime());
 							System.out.println(updateSQL + "   " + salt + "     " + Common.hashPassword(password + salt + SFAServer.getPepper()));
 							if (prep.executeUpdate() != 1)
 							{
