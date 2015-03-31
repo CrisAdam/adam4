@@ -22,7 +22,8 @@ public class SFAServer
 {
 
     // final variables
-    public final static int clientPort = 9898;
+	public final static int clientPort = 9898;
+	public final static int clientSSLPort = 9998;
     public final static int adminPort = 9899;
     public final static int ENDCHECKFREQUENCY = 1000;
     public final static int quadCapacity = 4;

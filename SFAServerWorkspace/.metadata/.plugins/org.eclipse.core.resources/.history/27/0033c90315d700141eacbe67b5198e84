@@ -1,0 +1,16 @@
+package com.adam4.common;
+
+import java.security.NoSuchAlgorithmException;
+
+final public class HashPassword
+{
+
+	Sting str;
+    public static void main(String[] args) throws NoSuchAlgorithmException, InterruptedException
+    {
+        for (String arg : args)
+        {
+            System.out.println(Common.hashPassword(arg));
+        }
+    }
+}

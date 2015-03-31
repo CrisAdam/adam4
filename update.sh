@@ -2,10 +2,11 @@
 
 gitDir=$HOME/adam4
 activeDir=$gitDir/run
-Config=`cat $HOME/config.txt`
-Config=`cat $HOME/config.txt | sed "/^-c$/d"`
+Config=`cat $HOME/Config.txt`
+Config=`cat $HOME/Config.txt | sed "/^-c$/d"`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 compileresult=1 
+secret=`echo $Config | perl -ne 'if (/-config2\s*(\S+)/) { print "$1\n"; }'`
 
 run()
 {

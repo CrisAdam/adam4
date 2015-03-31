@@ -6,6 +6,7 @@ config=`cat $HOME/Config.txt`
 config=`cat $HOME/Config.txt | sed "/^-c$/d"`
 srcDir=$gitDir/SFAServerWorkspace/SFAServer/src
 compileresult=1 
+secret=`echo $Config | perl -ne 'if (/-config2\s*(\S+)/) { print "$1\n"; }'`
 
 run()
 {

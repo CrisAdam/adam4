@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.net.ssl.SSLSocket;
 
 import com.adam4.common.Common;
 import com.adam4.irc.IRC;
@@ -20,15 +21,23 @@ import com.adam4.mylogger.MyLogger.LogLevel;
 public class ClientHandler implements Runnable
 {
 	Socket clientSocket;
+	SSLSocket  clientSSLSocket;
 	int currentGame = 0;  // 0 means not in game
 	int clientID = 0;  // 0 = not logged in
 	String password, user, nick;
 	PrintWriter output;
+	private final boolean ssl;
 	
 	ClientHandler(Socket connection)
 	{
 		clientSocket = connection;
-		
+		ssl = false;
+	}
+	
+	ClientHandler(SSLSocket  connection)
+	{
+		clientSSLSocket = connection;
+		ssl = true;
 	}
 
 	public void run()
@@ -42,10 +51,21 @@ public class ClientHandler implements Runnable
 	
 		try
 		{
-			input = new BufferedReader(new InputStreamReader(
-					clientSocket.getInputStream(),
-					StandardCharsets.UTF_8.newDecoder()));
-			output = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);
+			if (ssl)
+			{
+				input = new BufferedReader(new InputStreamReader(
+						clientSSLSocket.getInputStream(),
+						StandardCharsets.UTF_8.newDecoder()));
+				output = new PrintWriter(new OutputStreamWriter(clientSSLSocket.getOutputStream(), StandardCharsets.UTF_8), true);
+			}
+			else
+			{
+				input = new BufferedReader(new InputStreamReader(
+						clientSocket.getInputStream(),
+						StandardCharsets.UTF_8.newDecoder()));
+				output = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), StandardCharsets.UTF_8), true);
+			}
+			
 		}
 		catch (IOException e)
 		{
@@ -64,7 +84,15 @@ public class ClientHandler implements Runnable
 		{
 			try
 			{
-				clientSocket.close();
+				if (ssl)
+				{
+					clientSSLSocket.close();
+				}
+				else
+				{
+					clientSocket.close();
+				}
+				
 			}
 			catch (IOException e1)
 			{
@@ -72,8 +100,14 @@ public class ClientHandler implements Runnable
 			}
 			Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
 		}
-			
-		Common.log.logMessage("client handler closing: " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
+		if (ssl)
+		{
+			Common.log.logMessage("client handler closing: " + clientSSLSocket.getInetAddress(), MyLogger.LogLevel.INFO);
+		}
+		else
+		{
+			Common.log.logMessage("client handler closing: " + clientSocket.getInetAddress(), MyLogger.LogLevel.INFO);
+		}
 	}
 
 	private void handleMessage(ParsedMessage message)
@@ -509,17 +543,35 @@ public class ClientHandler implements Runnable
 		
 		SFAServer.connectedClients.remove(this);
 		
-		while (!clientSocket.isClosed())
+		if (ssl)
 		{
-			try
+			while (!clientSSLSocket.isClosed())
 			{
-				clientSocket.close();
-			}
-			catch (IOException e)
-			{
-				Common.log.logMessage(e, MyLogger.LogLevel.INFO);
+				try
+				{
+					clientSSLSocket.close();
+				}
+				catch (IOException e)
+				{
+					Common.log.logMessage(e, MyLogger.LogLevel.INFO);
+				}
 			}
 		}
+		else
+		{
+			while (!clientSocket.isClosed())
+			{
+				try
+				{
+					clientSocket.close();
+				}
+				catch (IOException e)
+				{
+					Common.log.logMessage(e, MyLogger.LogLevel.INFO);
+				}
+			}
+		}
+		
 	}
 
 	private void notice(String notice) 
