@@ -76,7 +76,6 @@ public class ClientHandler implements Runnable
 		{
 			while((unparsedMessage = input.readLine()) != null)
 			{
-				System.out.println("ClientHandler Recieved: " + unparsedMessage);
 				handleMessage(IRC.parseLine(unparsedMessage));
 			}
 		}
@@ -98,7 +97,8 @@ public class ClientHandler implements Runnable
 			{
 				e1.printStackTrace();
 			}
-			Common.log.logMessage(e, MyLogger.LogLevel.ERROR);
+			// will occur if client closes connection before issuing "quit"
+			//Common.log.logMessage(e, MyLogger.LogLevel.INFO);
 		}
 		if (ssl)
 		{
@@ -585,11 +585,11 @@ public class ClientHandler implements Runnable
 
         if (error.isEmpty())
         {
-            error = "empty error";
+            error = ":empty error";
         }
         if (!error.substring(0, 5).equals("ERROR "))
         {
-            error = "ERROR " + error;
+            error = "ERROR " + Common.prefixColon(error);
         }
         if (error.charAt(error.length() - 1) != '\n')
         {
@@ -601,7 +601,6 @@ public class ClientHandler implements Runnable
     
     private void sendMessage(ParsedMessage message)
     {
-    	System.out.println("Server sent: " + message);
         output.write(message + "\n");
         output.flush();
     }

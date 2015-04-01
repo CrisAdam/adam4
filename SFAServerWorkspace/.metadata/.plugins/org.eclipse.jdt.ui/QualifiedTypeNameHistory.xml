@@ -18,4 +18,6 @@
 <fullyQualifiedTypeName name="java.security.SecureRandom"/>
 <fullyQualifiedTypeName name="com.adam4.common.Common"/>
 <fullyQualifiedTypeName name="java.sql.Types"/>
+<fullyQualifiedTypeName name="javax.net.ssl.SSLServerSocket"/>
+<fullyQualifiedTypeName name="javax.net.ssl.SSLSocket"/>
 </qualifiedTypeNameHistroy>
