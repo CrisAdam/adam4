@@ -195,7 +195,7 @@ public class SFAServer
     	{
     		Common.log.logMessage("Unable to delete run file, terminating", LogLevel.ERROR);
 			System.exit(0);
-			Runtime.getRuntime().halt(0);
+			Runtime.getRuntime().halt(int)
 		}
     }
 

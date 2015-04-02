@@ -194,8 +194,16 @@ public class SFAServer
     	catch (IOException e) 
     	{
     		Common.log.logMessage("Unable to delete run file, terminating", LogLevel.ERROR);
-			System.exit(0);
-			Runtime.getRuntime().halt(0);
+			for (Thread t : Thread.getAllStackTraces().keySet()) 
+			{  if (t.getState()==Thread.State.RUNNABLE) 
+			     t.interrupt(); 
+			} 
+
+			for (Thread t : Thread.getAllStackTraces().keySet()) 
+			{  if (t.getState()==Thread.State.RUNNABLE) 
+			     t
+			}
+			e.printStackTrace();
 		}
     }
 
