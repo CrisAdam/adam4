@@ -1,0 +1,13 @@
+package com.adam4.geometry;
+
+import java.util.ArrayList;
+
+import com.adam4.common.Point;
+
+public class ConvexHull
+{
+	public static ArrayList<Point> findConvexPoints(ArrayList<Point> input)
+	{
+		return input;
+	}
+}

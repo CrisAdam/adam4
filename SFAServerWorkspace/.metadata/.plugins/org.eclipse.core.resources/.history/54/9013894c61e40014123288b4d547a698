@@ -1,0 +1,6 @@
+package com.adam4.geometry;
+
+public class ConvexHull
+{
+
+}
