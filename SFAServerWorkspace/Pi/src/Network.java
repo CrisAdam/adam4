@@ -1,10 +1,8 @@
 
 
 import java.io.IOException;
-import javax.net.ssl.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -14,7 +12,7 @@ public class Network
 {
 
     private static AtomicBoolean acceptingNewClients;
-
+    final static int port = 9090;
     private static ClientListener clientListener;
     private static Thread clientListenerThread;
 
@@ -51,7 +49,7 @@ public class Network
         public void run()
         {
         	Thread.currentThread().setName("Network Client Main");
-        	int port = 9090;
+        	
         	try
             {
         		

@@ -3,7 +3,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
@@ -33,34 +32,27 @@ public class Controller implements Runnable
 	************ 	39	40
 	 * 
 
-	pin 0 = left motor on
-	pin 1 = left motor reverse
-	pin 2 = right motor on
-	pin 3 = right motor reverse
+	pin 0,1 = left motor
+	pin 2,3 = right motor
 
 	gpio mode n out // set it as an output pin
-	gpio pin n 1
-	gpio pin n 0
+	gpio write n 1
+	gpio write n 0
 
 	 * 
 	 * 
 	 */
 	Socket s;
 	BufferedReader in;
-	Process p;
-	PrintWriter out;
 
 	public Controller(Socket clientSocket)
 	{
 		s = clientSocket;
 
-		String[] ex = { "/bin/sh", "-c" };
 		try
 		{
 			in = new BufferedReader(new InputStreamReader(s.getInputStream(),
 					StandardCharsets.UTF_8.newDecoder()));
-			p = Runtime.getRuntime().exec(ex);
-			out = new PrintWriter(p.getOutputStream());
 		} catch (IOException e)
 		{
 			try
@@ -78,6 +70,7 @@ public class Controller implements Runnable
 	@Override
 	public void run()
 	{
+		Thread.currentThread().setName("Client thread " + s.getInetAddress());
 		while (!s.isClosed())
 		{
 			String m = "";
@@ -86,41 +79,55 @@ public class Controller implements Runnable
 				while ((m = in.readLine()) != null)
 				{
 					char[] c = m.toCharArray();
-					switch (c[0])
+					if (c.length == 2)
 					{
-					case '0': // turn off left motor
-						out.println("gpio pin 0 0");
-						break;
-					case '1': // spin left motor forward
-						out.println("gpio pin 0 1");
-						out.println("gpio pin 1 0");
-						break;
-					case '2': // spin left motor backwards
-						out.println("gpio pin 0 1");
-						out.println("gpio pin 1 1");
-						break;
-					default:
-						break;
+						//System.out.println(m);
+						switch (c[0])
+						{
+						case '0': // turn off left motor
+							Reciever.out.println("gpio write 0 0");
+							Reciever.out.println("gpio write 1 0");
+							break;
+						case '1': // spin left motor forward
+							Reciever.out.println("gpio write 0 1");
+							Reciever.out.println("gpio write 1 0");
+							break;
+						case '2': // spin left motor backwards
+							Reciever.out.println("gpio write 0 0");
+							Reciever.out.println("gpio write 1 1");
+							break;
+						default:
+							break;
+						}
+						switch (c[1])
+						{
+						case '0': // turn off right motor
+							Reciever.out.println("gpio write 2 0");
+							Reciever.out.println("gpio write 3 0");
+							break;
+						case '1': // spin right motor forward
+							Reciever.out.println("gpio write 2 1");
+							Reciever.out.println("gpio write 3 0");
+							break;
+						case '2': // spin right motor backwards
+							Reciever.out.println("gpio write 2 0");
+							Reciever.out.println("gpio write 3 1");
+							break;
+						default:
+							break;
+						}
+						Reciever.out.flush();
+						while ((m = Reciever.stdError.readLine()) != null)
+						{
+							System.out.println(m);
+						}
+						while ((m = Reciever.stdInput.readLine()) != null)
+						{
+							System.out.println(m);
+						}
 					}
-					switch (c[1])
-					{
-					case '0': // turn off right motor
-						out.println("gpio pin 2 0");
-						break;
-					case '1': // spin right motor forward
-						out.println("gpio pin 2 1");
-						out.println("gpio pin 3 0");
-						break;
-					case '2': // spin right motor backwards
-						out.println("gpio pin 2 1");
-						out.println("gpio pin 3 1");
-						break;
-					default:
-						break;
-					}
-					out.flush();
+					
 				}
-				Thread.sleep(1);
 			} catch (IOException e)
 			{
 				try
@@ -132,9 +139,6 @@ public class Controller implements Runnable
 					e1.printStackTrace();
 				}
 				e.printStackTrace();
-			} catch (InterruptedException e)
-			{
-				// thread was woken early, no issue
 			}
 		}
 
