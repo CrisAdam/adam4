@@ -1,0 +1,6 @@
+17:26:08 **** Build of configuration Release for project CarController ****
+make all 
+Cannot run program "make": Launching failed
+
+Error: Program "make" not found in PATH
+PATH=[/bin/;;C:/Program Files (x86)/Arduino/hardware/tools/avr/utils/bin;C:/Java/jdk-8u40-windows-x64/bin/../jre/bin/server;C:/Java/jdk-8u40-windows-x64/bin/../jre/bin;C:/Java/jdk-8u40-windows-x64/bin/../jre/lib/amd64;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Development\git\bin;C:\Java\jdk-8u40-windows-x64\bin;C:\Program Files (x86)\Skype\Phone\;C:\Development\eclipseCpp]

@@ -2,20 +2,13 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="motd" key="selection"/>
+		<item value="" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="motd"/>
-			<item value="invalid login credentials"/>
-			<item value="a login error has occured"/>
-			<item value="Not logged in"/>
-			<item value="unable to process registrations at this time"/>
-			<item value="unable to accept registrations at this time"/>
-			<item value="register"/>
-			<item value="clientDatabase"/>
+			<item value="exec"/>
 		</list>
 		<list key="replacehistory">
 		</list>
@@ -23,8 +16,8 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="357" key="DIALOG_WIDTH"/>
 		<item value="1|Segoe UI|11.4|0|WINDOWS|1|-19|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
-		<item value="496" key="DIALOG_HEIGHT"/>
-		<item value="1712" key="DIALOG_X_ORIGIN"/>
-		<item value="949" key="DIALOG_Y_ORIGIN"/>
+		<item value="503" key="DIALOG_HEIGHT"/>
+		<item value="803" key="DIALOG_X_ORIGIN"/>
+		<item value="485" key="DIALOG_Y_ORIGIN"/>
 	</section>
 </section>

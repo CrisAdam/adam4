@@ -1,0 +1,13 @@
+Arduino\ Board=Arduino BT
+Arduino\ Custom\ Option\ Selections=
+Arduino\ IDE\ Version=1.6.5-r2
+Arduino\ Path=C\:\\Program Files (x86)\\Arduino
+Arduino\ Port=COM5
+Arduino\ boards\ file=C\:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\boards.txt
+FsStatus=2
+FuStatub=1
+JANTJE.TEMPLATE_FOLDER=
+JANTJE.TEMPLATE_USE_DEFAULT=true
+Private\ Library\ Path=C\:\\Program Files (x86)\\Arduino\\libraries
+Private\ hardware\ Path=C\:\\Program Files (x86)\\Arduino\\hardware
+eclipse.preferences.version=1

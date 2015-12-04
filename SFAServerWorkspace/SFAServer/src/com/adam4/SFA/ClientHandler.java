@@ -256,7 +256,7 @@ public class ClientHandler implements Runnable
 				ResultSet rs = prep.executeQuery();
 				if (rs.first()) 
 				{
-					// username/nick is taken available
+					// username/nick is taken
 					sendError("Error: username or nick is unavailable");
 					return;
 				}
@@ -272,8 +272,8 @@ public class ClientHandler implements Runnable
 				{
 						try 
 						{
-							String text = "Hello " + message.args[1] + ", \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
-							String[] ex = {"/bin/sh", "-c", 
+				//			String text = "Hello " + message.args[1] + ", \n Thank you for registering with SFA \n To validate this e-mail account, please copy the following into the verification box: \n \n  " + salt + " \n \n If you believe that you recieved this message in error, simply ignore it.";
+				//			String[] ex = {"/bin/sh", "-c", 
 								"echo \"" + text + "\" | mail -s \"SFA Registration\" " + message.args[0]};
 
 							Common.log.logMessage("$" + ex + "$", LogLevel.DEBUG);
